@@ -32,6 +32,7 @@ model Portfolio {
   settings   Settings?
 
   @@index([slug])
+  @@index([templateId])
 }
 
 model Section {
@@ -42,6 +43,9 @@ model Section {
   order       Int
   isVisible   Boolean   @default(true)
   content     Json
+
+  @@index([portfolioId])
+  @@index([portfolioId, order])
 }
 
 model Settings {
@@ -75,6 +79,9 @@ model TemplateSection {
   type       String
   order      Int
   content    Json
+
+  @@index([templateId])
+  @@index([templateId, order])
 }
 
 
