@@ -14,10 +14,20 @@ export type HeroContent = z.infer<typeof HeroContentSchema>;
 
 interface HeroSectionProps {
   content: HeroContent;
-  onCtaClick?: () => void;
 }
 
-export function HeroSection({ content, onCtaClick }: HeroSectionProps) {
+export function HeroSection({ content }: HeroSectionProps) {
+  const handleScrollToNext = () => {
+    const nextSections = ["about", "projects", "contact"];
+    for (const id of nextSections) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+        break;
+      }
+    }
+  };
+
   return (
     <section
       id="hero"
@@ -33,7 +43,7 @@ export function HeroSection({ content, onCtaClick }: HeroSectionProps) {
         {content.ctaText && (
           <div className="pt-4">
             <button
-              onClick={onCtaClick}
+              onClick={handleScrollToNext}
               className="px-8 py-4 rounded-full font-bold text-sm tracking-wide text-white transition-all duration-300 hover:scale-105 shadow-xl cursor-pointer"
               style={{
                 backgroundColor: "var(--theme-primary)",

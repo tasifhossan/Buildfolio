@@ -11,16 +11,15 @@ export interface Section {
 
 interface SectionRendererProps {
   section: Section;
-  onCtaClick?: () => void; // Optional handler to navigate when CTA button is clicked
 }
 
-export function SectionRenderer({ section, onCtaClick }: SectionRendererProps) {
+export function SectionRenderer({ section }: SectionRendererProps) {
   // Safe validation wrapper to catch malformed data and prevent layout crashes
   try {
     switch (section.type.toLowerCase()) {
       case "hero": {
         const validatedContent = HeroContentSchema.parse(section.content || {});
-        return <HeroSection content={validatedContent} onCtaClick={onCtaClick} />;
+        return <HeroSection content={validatedContent} />;
       }
       case "about": {
         const validatedContent = AboutContentSchema.parse(section.content || {});
