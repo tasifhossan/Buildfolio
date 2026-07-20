@@ -81,9 +81,27 @@ export default async function UsernamePage({ params }: PageProps) {
       <PortfolioHeader username={username} menuLinks={menuLinks} />
 
       <main className="pb-24">
-        {sanitizedSections.map((section) => (
-          <SectionRenderer key={section.type} section={section} />
-        ))}
+        {sanitizedSections.length === 0 ? (
+          <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-6 py-20 bg-radial from-[var(--theme-primary-glow)] via-transparent to-transparent">
+            <div className="max-w-md space-y-6">
+              <div className="w-16 h-16 rounded-full bg-zinc-950 border border-zinc-900 flex items-center justify-center mx-auto text-zinc-500 shadow-lg shadow-black/20">
+                <svg className="w-8 h-8 text-[var(--theme-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                </svg>
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold text-zinc-200">Portfolio Under Construction</h2>
+                <p className="text-sm text-zinc-400 leading-relaxed font-light">
+                  This portfolio is still being set up by the owner. Please check back soon to view their projects and skills!
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          sanitizedSections.map((section) => (
+            <SectionRenderer key={section.type} section={section} />
+          ))
+        )}
       </main>
 
       <footer className="border-t border-zinc-900 py-12 bg-zinc-950/20">
