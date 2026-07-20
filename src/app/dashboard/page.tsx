@@ -1,5 +1,6 @@
 import { getCurrentUserPortfolio } from "@/lib/get-current-user-portfolio";
 import { DashboardClient } from "./dashboard-client";
+import Link from "next/link";
 
 export default async function DashboardPage() {
   try {
@@ -25,12 +26,12 @@ export default async function DashboardPage() {
           <p className="text-zinc-400 mb-6">
             {error instanceof Error ? error.message : "An unexpected error occurred while loading your portfolio."}
           </p>
-          <a
+          <Link
             href="/login"
             className="inline-block w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white font-semibold py-3 px-6 rounded-xl transition duration-200"
           >
             Go to Login
-          </a>
+          </Link>
         </div>
       </div>
     );
