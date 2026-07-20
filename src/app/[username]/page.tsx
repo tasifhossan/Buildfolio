@@ -6,6 +6,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import React from "react";
 
+export const revalidate = 60; // Regenerate pages at most once per minute
+
 interface PageProps {
   params: Promise<{ username: string }>;
 }
