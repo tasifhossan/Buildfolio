@@ -1,8 +1,47 @@
 import React from "react";
-import { HeroSection, HeroContentSchema } from "./sections/HeroSection";
-import { AboutSection, AboutContentSchema } from "./sections/AboutSection";
-import { ProjectsSection, ProjectsContentSchema } from "./sections/ProjectsSection";
-import { ContactSection, ContactContentSchema } from "./sections/ContactSection";
+import { z } from "zod";
+import { HeroSection } from "./sections/HeroSection";
+import { AboutSection } from "./sections/AboutSection";
+import { ProjectsSection } from "./sections/ProjectsSection";
+import { ContactSection } from "./sections/ContactSection";
+
+// Zod validation schemas
+export const HeroContentSchema = z.object({
+  title: z.string().optional().default("Welcome to my portfolio"),
+  subtitle: z.string().optional().default("I build high-quality digital experiences."),
+  ctaText: z.string().optional(),
+});
+
+export const AboutContentSchema = z.object({
+  bio: z.string().optional().default("No biography provided yet."),
+  skills: z.array(z.string()).optional().default([]),
+});
+
+export const ProjectItemSchema = z.object({
+  name: z.string().optional(),
+  title: z.string().optional(),
+  description: z.string().optional().default("No description provided."),
+  link: z.string().optional(),
+});
+
+export const ProjectsContentSchema = z.object({
+  title: z.string().optional().default("Projects"),
+  list: z.array(ProjectItemSchema).optional(),
+  items: z.array(ProjectItemSchema).optional(),
+});
+
+export const ContactContentSchema = z.object({
+  title: z.string().optional().default("Contact"),
+  email: z.string().optional(),
+  github: z.string().optional(),
+  linkedin: z.string().optional(),
+});
+
+// Inferred TypeScript types
+export type HeroContent = z.infer<typeof HeroContentSchema>;
+export type AboutContent = z.infer<typeof AboutContentSchema>;
+export type ProjectsContent = z.infer<typeof ProjectsContentSchema>;
+export type ContactContent = z.infer<typeof ContactContentSchema>;
 
 export interface Section {
   type: string;

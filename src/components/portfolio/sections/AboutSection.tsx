@@ -1,13 +1,5 @@
 import React from "react";
-import { z } from "zod";
-
-// Zod schema matching the JSON shape from the seed data
-export const AboutContentSchema = z.object({
-  bio: z.string().optional().default("No biography provided yet."),
-  skills: z.array(z.string()).optional().default([]),
-});
-
-export type AboutContent = z.infer<typeof AboutContentSchema>;
+import type { AboutContent } from "../SectionRenderer";
 
 interface AboutSectionProps {
   content: AboutContent;

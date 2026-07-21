@@ -1,15 +1,5 @@
 import React from "react";
-import { z } from "zod";
-
-// Zod schema matching the JSON shape from the seed data
-export const ContactContentSchema = z.object({
-  title: z.string().optional().default("Contact"),
-  email: z.string().optional(),
-  github: z.string().optional(),
-  linkedin: z.string().optional(),
-});
-
-export type ContactContent = z.infer<typeof ContactContentSchema>;
+import type { ContactContent } from "../SectionRenderer";
 
 interface ContactSectionProps {
   content: ContactContent;

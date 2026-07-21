@@ -1,21 +1,5 @@
 import React from "react";
-import { z } from "zod";
-
-// Zod schema matching the JSON shape from the seed data and supported variations
-export const ProjectItemSchema = z.object({
-  name: z.string().optional(),
-  title: z.string().optional(),
-  description: z.string().optional().default("No description provided."),
-  link: z.string().optional(),
-});
-
-export const ProjectsContentSchema = z.object({
-  title: z.string().optional().default("Projects"),
-  list: z.array(ProjectItemSchema).optional(),
-  items: z.array(ProjectItemSchema).optional(),
-});
-
-export type ProjectsContent = z.infer<typeof ProjectsContentSchema>;
+import type { ProjectsContent } from "../SectionRenderer";
 
 interface ProjectsSectionProps {
   content: ProjectsContent;

@@ -1,16 +1,7 @@
 "use client";
 
 import React from "react";
-import { z } from "zod";
-
-// Zod schema matching the JSON shape from the seed data
-export const HeroContentSchema = z.object({
-  title: z.string().optional().default("Welcome to my portfolio"),
-  subtitle: z.string().optional().default("I build high-quality digital experiences."),
-  ctaText: z.string().optional(),
-});
-
-export type HeroContent = z.infer<typeof HeroContentSchema>;
+import type { HeroContent } from "../SectionRenderer";
 
 interface HeroSectionProps {
   content: HeroContent;
