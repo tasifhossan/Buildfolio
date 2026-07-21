@@ -11,7 +11,7 @@ A multi-tenant, scalable portfolio-builder web app where users can sign up, choo
 - **Image storage:** Cloudinary
 - **Validation:** Zod
 - **Styling:** Tailwind CSS
-- **IDE / workflow:** Google Antigravity (agentic development)
+
 
 ## Architecture Overview
 
