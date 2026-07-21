@@ -17,7 +17,7 @@ A multi-tenant, scalable portfolio-builder web app where users can sign up, choo
 
 Buildfolio is multi-tenant by design. Each user owns exactly one `Portfolio`, made up of ordered `Section` rows with flexible JSON content (validated per section type with Zod). New users can apply a pre-built `Template` — which clones its `TemplateSection` rows into their own `Section` rows — or start from a blank portfolio and build sections manually later.
 
-Public portfolios are served at `/[username]` as server-rendered, ISR-cached pages, so edits are fast to make but the site stays performant at scale.
+Public portfolios are served under their own subdomains (e.g., `username.localhost:3000` in dev or `username.buildfolio.com` in prod) using Next.js Middleware to internally rewrite the incoming request to the dynamic `/[username]` page route. This allows `app/[username]/page.tsx` to handle the portfolio rendering seamlessly without any route changes.
 
 ## Data Model
 
@@ -46,6 +46,8 @@ Foreign keys use cascading deletes, and indexes are set on `slug` and all foreig
 - Signup flow creates a `User` and a blank `Portfolio` (auto-generated unique slug) in a single transaction
 - Tenant-scoping helper ensures every dashboard query is filtered by the authenticated user's ownership
 - Middleware protects all `/dashboard` routes, redirecting unauthenticated visitors to `/login`
+- Subdomain Routing: Added middleware subdomain detection for `localhost:3000` and configurable `NEXT_PUBLIC_ROOT_DOMAIN` to rewrite requests to user portfolios.
+- Portfolio URL Helper: Created `getPortfolioUrl` utility to generate public subdomain URLs dynamically in all environments, and updated the Dashboard's "View Site" button.
 - Template selection built as a dashboard action (not forced onboarding):
   - `GET /api/templates` — lists active templates
   - `POST /api/portfolio/apply-template` — clones a template's sections into the user's portfolio inside a transaction, scoped strictly by session user ID

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { getPortfolioUrl } from "@/lib/get-portfolio-url";
 
 interface HeroContent {
   title?: string;
@@ -204,7 +205,7 @@ export function DashboardClient({ initialPortfolio }: DashboardClientProps) {
 
           <div className="flex items-center gap-3">
             <a
-              href={`/${portfolio.slug}`}
+              href={getPortfolioUrl(portfolio.slug)}
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-zinc-300 hover:text-white bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-lg transition duration-150 flex items-center gap-1.5 hover:bg-zinc-800"
