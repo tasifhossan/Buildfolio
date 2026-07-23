@@ -111,3 +111,43 @@ export async function POST(req: Request) {
     );
   }
 }
+
+export async function GET() {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
+  try {
+    const portfolio = await prisma.portfolio.findFirst({
+      where: { userId: session.user.id },
+      include: {
+        sections: {
+          orderBy: {
+            order: "asc",
+          },
+        },
+      },
+    });
+
+    if (!portfolio) {
+      return NextResponse.json(
+        { error: "Portfolio not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(portfolio.sections);
+  } catch (error) {
+    console.error("Error fetching sections:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch sections" },
+      { status: 500 }
+    );
+  }
+}
+
