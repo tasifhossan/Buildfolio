@@ -25,7 +25,21 @@ interface Section {
   type: string;
   order: number;
   isVisible: boolean;
-  content: any;
+  content: {
+    title?: string;
+    subtitle?: string;
+    ctaText?: string;
+    bio?: string;
+    skills?: string[];
+    list?: {
+      name: string;
+      description: string;
+      link: string;
+    }[];
+    email?: string;
+    github?: string;
+    linkedin?: string;
+  };
 }
 
 interface SortableItemProps {
@@ -137,6 +151,7 @@ export function SectionList() {
   
   // Create Section state
   const [creatingType, setCreatingType] = useState<string | null>(null);
+  const [showAddDropdown, setShowAddDropdown] = useState(false);
 
   // Delete modal state
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -335,28 +350,61 @@ export function SectionList() {
           <p className="text-[11px] text-zinc-500">Drag to reorder, toggle visibility, edit details, or delete sections.</p>
         </div>
 
-        {/* Section Creation Options */}
-        <div className="flex flex-wrap gap-2">
-          {["Hero", "About", "Projects", "Contact"].map((type) => (
-            <button
-              key={type}
-              onClick={() => handleCreateSection(type)}
-              disabled={creatingType !== null}
-              className="bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-800 text-white disabled:text-zinc-500 font-semibold text-xs py-1.5 px-3 rounded-lg transition duration-150 flex items-center gap-1 cursor-pointer"
-              type="button"
+        {/* Section Creation Options Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => {
+              if (creatingType === null) {
+                setShowAddDropdown(!showAddDropdown);
+              }
+            }}
+            disabled={creatingType !== null}
+            className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-2 px-4 rounded-xl transition duration-150 flex items-center gap-1.5 cursor-pointer shadow-md shadow-indigo-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
+            type="button"
+          >
+            <span>Add Section</span>
+            <svg
+              className={`w-3.5 h-3.5 transition-transform duration-200 ${showAddDropdown ? "rotate-180" : ""}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              {creatingType === type ? (
-                <>
-                  <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  <span>Adding...</span>
-                </>
-              ) : (
-                <>
-                  <span>+ {type}</span>
-                </>
-              )}
-            </button>
-          ))}
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {showAddDropdown && (
+            <>
+              {/* Click outside backdrop to close */}
+              <div
+                className="fixed inset-0 z-10"
+                onClick={() => {
+                  if (creatingType === null) {
+                    setShowAddDropdown(false);
+                  }
+                }}
+              />
+              <div className="absolute right-0 mt-2 w-40 rounded-xl bg-zinc-900 border border-zinc-800 shadow-xl py-1.5 z-20 animate-[cardFadeIn_0.15s_cubic-bezier(0.16,1,0.3,1)]">
+                {["Hero", "About", "Projects", "Contact"].map((type) => (
+                  <button
+                    key={type}
+                    disabled={creatingType !== null}
+                    onClick={async () => {
+                      await handleCreateSection(type);
+                      setShowAddDropdown(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-xs font-medium text-zinc-300 hover:text-white hover:bg-zinc-800/80 transition duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-between gap-2"
+                    type="button"
+                  >
+                    <span>{type}</span>
+                    {creatingType === type && (
+                      <div className="w-3 h-3 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin shrink-0"></div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
 

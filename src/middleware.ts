@@ -28,8 +28,33 @@ export default auth((req) => {
     }
   }
 
-  // 2. If subdomain exists and is not 'www' or empty, rewrite request internally to /[subdomain]
-  if (subdomain && subdomain !== "www") {
+  // Redirect /dashboard and /login on any non-root subdomain to the root domain equivalent
+  const isDashboardOrLogin =
+    pathname === "/dashboard" || pathname.startsWith("/dashboard/") ||
+    pathname === "/login" || pathname.startsWith("/login/");
+
+  if (subdomain && subdomain !== "www" && isDashboardOrLogin) {
+    const redirectUrl = nextUrl.clone();
+    const [domainHost, domainPort] = rootDomain.split(":");
+    redirectUrl.hostname = domainHost === "localhost" ? "localhost." : domainHost;
+    redirectUrl.port = domainPort || "";
+    const redirectTarget = redirectUrl.toString();
+    return new Response(null, {
+      status: 307,
+      headers: {
+        Location: redirectTarget,
+      },
+    });
+  }
+
+  // 2. Skip subdomain rewrite for reserved app routes
+  const reservedPaths = ["/api", "/signup", "/login", "/dashboard"];
+  const isReserved = reservedPaths.some(
+    (path) => pathname === path || pathname.startsWith(path + "/")
+  );
+
+  // 3. If subdomain exists and is not 'www' or empty, and is not a reserved path, rewrite request internally to /[subdomain]
+  if (subdomain && subdomain !== "www" && !isReserved) {
     return NextResponse.rewrite(new URL(`/${subdomain}${pathname}${nextUrl.search}`, req.url));
   }
 

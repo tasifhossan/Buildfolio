@@ -12,7 +12,9 @@ const createSectionSchema = z.object({
   ),
 });
 
-const DEFAULT_CONTENTS: Record<string, any> = {
+type JsonValue = string | number | boolean | null | { [key: string]: JsonValue } | JsonValue[];
+
+const DEFAULT_CONTENTS: Record<string, Record<string, JsonValue>> = {
   hero: {
     title: "Welcome to my portfolio",
     subtitle: "I build high-quality digital experiences.",

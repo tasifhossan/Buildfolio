@@ -129,7 +129,8 @@ export function DashboardClient({ initialPortfolio }: DashboardClientProps) {
     await signOut({ redirect: true, callbackUrl: "/login" });
   };
 
-  const renderSectionContent = (section: Section) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _renderSectionContent = (section: Section) => {
     switch (section.type) {
       case "Hero": {
         const c = section.content as HeroContent;
