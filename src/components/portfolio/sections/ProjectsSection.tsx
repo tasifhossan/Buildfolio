@@ -26,30 +26,41 @@ export function ProjectsSection({ content }: ProjectsSectionProps) {
             {projectsList.map((project, idx) => {
               const projectTitle = project.name || project.title || "Untitled Project";
               const Card = () => (
-                <div className="h-full bg-zinc-950/40 border border-zinc-900 hover:border-zinc-800 p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20 group flex flex-col justify-between">
+                <div className="h-full bg-zinc-950/40 border border-zinc-900 hover:border-zinc-800 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20 group flex flex-col justify-between">
                   <div>
-                    <div className="flex items-start justify-between gap-4">
-                      <h3 className="text-lg font-bold text-zinc-100 group-hover:text-white transition-colors duration-150">
-                        {projectTitle}
-                      </h3>
-                      {project.link && (
-                        <svg
-                          className="w-4 h-4 text-zinc-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                        </svg>
-                      )}
+                    {project.imageUrl && (
+                      <div className="w-full aspect-video overflow-hidden border-b border-zinc-900 bg-zinc-950 relative">
+                        <img
+                          src={project.imageUrl}
+                          alt={projectTitle}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      </div>
+                    )}
+                    <div className="p-6">
+                      <div className="flex items-start justify-between gap-4">
+                        <h3 className="text-lg font-bold text-zinc-100 group-hover:text-white transition-colors duration-150">
+                          {projectTitle}
+                        </h3>
+                        {project.link && (
+                          <svg
+                            className="w-4 h-4 text-zinc-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        )}
+                      </div>
+                      <p className="text-zinc-400 text-sm font-light mt-3 leading-relaxed">
+                        {project.description}
+                      </p>
                     </div>
-                    <p className="text-zinc-400 text-sm font-light mt-3 leading-relaxed">
-                      {project.description}
-                    </p>
                   </div>
                   {project.link && (
-                    <div className="mt-6 pt-4 border-t border-zinc-900/50 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--theme-primary)] opacity-80 group-hover:opacity-100 transition-opacity">
+                    <div className="mx-6 mb-6 pt-4 border-t border-zinc-900/50 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--theme-primary)] opacity-80 group-hover:opacity-100 transition-opacity">
                       <span>View Project</span>
                     </div>
                   )}

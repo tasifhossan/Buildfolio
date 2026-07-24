@@ -18,7 +18,8 @@ const ProjectItemSchema = z.object({
   name: z.string().optional(),
   title: z.string().optional(),
   description: z.string().optional(),
-  link: z.string().optional(),
+  link: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  imageUrl: z.string().optional(),
 });
 
 const ProjectsContentSchema = z.object({

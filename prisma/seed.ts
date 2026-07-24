@@ -56,14 +56,16 @@ async function main() {
           title: "Featured Projects",
           list: [
             {
-              name: "Buildfolio",
+              title: "Buildfolio",
               description: "An open-source portfolio builder for developers.",
               link: "https://github.com",
+              imageUrl: "",
             },
             {
-              name: "NextAuth Custom Adapter",
+              title: "NextAuth Custom Adapter",
               description: "A fast, Edge-compatible NextAuth adapter.",
               link: "https://github.com",
+              imageUrl: "",
             },
           ],
         },

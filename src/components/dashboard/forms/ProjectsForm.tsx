@@ -7,6 +7,7 @@ export interface ProjectItem {
   title?: string;
   description?: string;
   link?: string;
+  imageUrl?: string;
 }
 
 export interface ProjectsContent {
@@ -36,6 +37,50 @@ export function ProjectsForm({ section, onSave, isSaving = false }: ProjectsForm
   const [list, setList] = useState<ProjectItem[]>(
     initialContent.list || initialContent.items || []
   );
+  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+
+  const handleImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Client-side validations
+    const maxFileSize = 5 * 1024 * 1024;
+    if (file.size > maxFileSize) {
+      alert("File size exceeds 5MB limit");
+      return;
+    }
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      alert("Only JPEG, PNG and WEBP images are allowed");
+      return;
+    }
+
+    setUploadingIndex(index);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to upload image");
+      }
+
+      const data = await res.json();
+      handleItemChange(index, "imageUrl", data.secure_url);
+    } catch (err) {
+      console.error("Upload error:", err);
+      alert(err instanceof Error ? err.message : "Failed to upload image");
+    } finally {
+      setUploadingIndex(null);
+      e.target.value = "";
+    }
+  };
 
   const handleAddItem = () => {
     setList((prev) => [
@@ -160,6 +205,63 @@ export function ProjectsForm({ section, onSave, isSaving = false }: ProjectsForm
                         className="w-full bg-zinc-900/60 border border-zinc-800/80 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg px-3 py-2 text-xs text-zinc-200 transition outline-none placeholder:text-zinc-600 disabled:opacity-50"
                         placeholder="https://github.com/..."
                       />
+                    </div>
+                  </div>
+
+                  {/* Image URL and Upload Field */}
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-semibold text-zinc-500">Project Image</label>
+                    <div className="flex items-center gap-3">
+                      {item.imageUrl ? (
+                        <div className="relative w-16 h-12 rounded-lg overflow-hidden border border-zinc-800 bg-zinc-950 shrink-0">
+                          <img
+                            src={item.imageUrl}
+                            alt="Project Preview"
+                            className="w-full h-full object-cover"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleItemChange(index, "imageUrl", "")}
+                            className="absolute inset-0 bg-black/60 opacity-0 hover:opacity-100 transition flex items-center justify-center text-red-400 font-bold text-[10px] cursor-pointer"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="w-16 h-12 rounded-lg border border-dashed border-zinc-800 flex items-center justify-center text-zinc-600 text-[10px] bg-zinc-950/20 shrink-0 select-none">
+                          No Image
+                        </div>
+                      )}
+                      
+                      <div className="flex-1 flex gap-2">
+                        <input
+                          type="text"
+                          value={item.imageUrl || ""}
+                          onChange={(e) => handleItemChange(index, "imageUrl", e.target.value)}
+                          disabled={isSaving || uploadingIndex === index}
+                          className="flex-1 bg-zinc-900/60 border border-zinc-800/80 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg px-3 py-2 text-xs text-zinc-200 transition outline-none placeholder:text-zinc-600 disabled:opacity-50"
+                          placeholder="Image URL or upload..."
+                        />
+                        <label className="relative shrink-0">
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            onChange={(e) => handleImageUpload(index, e)}
+                            disabled={isSaving || uploadingIndex !== null}
+                            className="hidden"
+                          />
+                          <span className={`bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-zinc-300 font-semibold text-xs py-2 px-3 rounded-lg border border-zinc-700/60 transition cursor-pointer flex items-center gap-1.5 h-full ${uploadingIndex === index ? 'opacity-50 pointer-events-none' : ''}`}>
+                            {uploadingIndex === index ? (
+                              <div className="w-3.5 h-3.5 border-2 border-zinc-300/30 border-t-zinc-300 rounded-full animate-spin"></div>
+                            ) : (
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                              </svg>
+                            )}
+                            Upload
+                          </span>
+                        </label>
+                      </div>
                     </div>
                   </div>
 
