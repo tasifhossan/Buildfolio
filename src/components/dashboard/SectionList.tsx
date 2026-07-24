@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { HeroForm } from "./forms/HeroForm";
 import { AboutForm } from "./forms/AboutForm";
 import { ContactForm } from "./forms/ContactForm";
+import { ProjectsForm } from "./forms/ProjectsForm";
 import {
   DndContext,
   closestCenter,
@@ -609,6 +610,12 @@ export function SectionList() {
               />
             ) : editingSection.type === "Contact" ? (
               <ContactForm
+                section={editingSection}
+                isSaving={isSavingSection}
+                onSave={handleSaveSectionContent}
+              />
+            ) : editingSection.type === "Projects" ? (
+              <ProjectsForm
                 section={editingSection}
                 isSaving={isSavingSection}
                 onSave={handleSaveSectionContent}
