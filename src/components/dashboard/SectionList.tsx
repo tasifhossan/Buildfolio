@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { HeroForm } from "./forms/HeroForm";
 import {
   DndContext,
   closestCenter,
@@ -46,9 +47,10 @@ interface SortableItemProps {
   section: Section;
   onToggleVisibility: (id: string, isVisible: boolean) => void;
   onDeleteClick: (id: string) => void;
+  onEditClick: (section: Section) => void;
 }
 
-function SortableItem({ section, onToggleVisibility, onDeleteClick }: SortableItemProps) {
+function SortableItem({ section, onToggleVisibility, onDeleteClick, onEditClick }: SortableItemProps) {
   const {
     attributes,
     listeners,
@@ -122,9 +124,9 @@ function SortableItem({ section, onToggleVisibility, onDeleteClick }: SortableIt
           </span>
         </label>
 
-        {/* Edit Button (Placeholder) */}
+        {/* Edit Button */}
         <button
-          onClick={() => alert("Edit mode placeholder - wired up in the next step!")}
+          onClick={() => onEditClick(section)}
           className="text-xs font-semibold text-zinc-300 hover:text-white bg-zinc-800/80 hover:bg-zinc-700 border border-zinc-700/50 px-3.5 py-1.5 rounded-lg transition cursor-pointer"
           type="button"
         >
@@ -156,6 +158,53 @@ export function SectionList() {
   // Delete modal state
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Edit modal state
+  const [editingSection, setEditingSection] = useState<Section | null>(null);
+  const [isSavingSection, setIsSavingSection] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+
+  const handleEditClick = (section: Section) => {
+    setEditingSection(section);
+    setEditError(null);
+  };
+
+  const handleSaveSectionContent = async (updatedContent: any) => {
+    if (!editingSection) return;
+    setIsSavingSection(true);
+    setEditError(null);
+    try {
+      const res = await fetch(`/api/portfolio/sections/${editingSection.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content: updatedContent }),
+      });
+
+      if (!res.ok) {
+        let errorMessage = "Failed to update section";
+        try {
+          const errorData = await res.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          errorMessage = `Error ${res.status}: ${res.statusText || "Failed to update section"}`;
+        }
+        throw new Error(errorMessage);
+      }
+
+      const updatedSection = await res.json();
+      setSections((prev) =>
+        prev.map((s) => (s.id === updatedSection.id ? updatedSection : s))
+      );
+      setEditingSection(null);
+    } catch (err) {
+      console.error("Failed to save section content:", err);
+      setEditError(err instanceof Error ? err.message : "Failed to save section content");
+    } finally {
+      setIsSavingSection(false);
+    }
+  };
 
   // Sensors for DnD
   const sensors = useSensors(
@@ -458,6 +507,7 @@ export function SectionList() {
                   section={section}
                   onToggleVisibility={handleToggleVisibility}
                   onDeleteClick={handleDeleteClick}
+                  onEditClick={handleEditClick}
                 />
               ))}
             </div>
@@ -472,7 +522,7 @@ export function SectionList() {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-red-950/40 border border-red-500/30 flex items-center justify-center text-red-400 shrink-0">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
               </div>
               <div>
@@ -510,6 +560,56 @@ export function SectionList() {
                 )}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Edit Modal with Glassmorphism */}
+      {editingSection && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]">
+          <div className="max-w-lg w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl space-y-6 animate-[scaleIn_0.2s_ease-out]">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+              <h3 className="text-base font-bold text-zinc-100 flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                Edit {editingSection.type} Section
+              </h3>
+              <button
+                onClick={() => setEditingSection(null)}
+                disabled={isSavingSection}
+                className="text-zinc-500 hover:text-zinc-300 transition cursor-pointer disabled:opacity-50"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {editError && (
+              <div className="bg-red-950/30 border border-red-900/30 text-red-400 px-4 py-3 rounded-xl text-xs flex items-start gap-2.5">
+                <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{editError}</span>
+              </div>
+            )}
+
+            {editingSection.type === "Hero" ? (
+              <HeroForm
+                section={editingSection}
+                isSaving={isSavingSection}
+                onSave={handleSaveSectionContent}
+              />
+            ) : (
+              <div className="text-center py-6 space-y-2">
+                <p className="text-xs text-zinc-400">Editor for {editingSection.type} section is coming soon.</p>
+                <button
+                  onClick={() => setEditingSection(null)}
+                  className="bg-zinc-800 text-zinc-300 hover:bg-zinc-700 px-4 py-2 rounded-xl text-xs transition font-semibold"
+                >
+                  Close
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
