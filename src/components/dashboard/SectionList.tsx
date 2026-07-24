@@ -264,6 +264,20 @@ export function SectionList() {
   };
 
   const handleCreateSection = async (type: string) => {
+    // Check if a section of this type already exists in the current list
+    const hasDuplicate = sections.some(
+      (s) => s.type.toLowerCase() === type.toLowerCase()
+    );
+
+    if (hasDuplicate) {
+      const confirmed = window.confirm(
+        `You already have a ${type} section. Add another one anyway?`
+      );
+      if (!confirmed) {
+        return;
+      }
+    }
+
     setCreatingType(type);
     setError(null);
     try {
@@ -276,15 +290,21 @@ export function SectionList() {
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to create section");
+        let errorMessage = "Failed to create section";
+        try {
+          const errorData = await res.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          errorMessage = `Error ${res.status}: ${res.statusText || "Failed to create section"}`;
+        }
+        throw new Error(errorMessage);
       }
 
       const newSection = await res.json();
       setSections((prev) => [...prev, newSection]);
     } catch (err) {
-      console.error(err);
-      setError(err instanceof Error ? err.message : "Failed to create section");
+      console.error("Failed to create section:", err);
+      setError(err instanceof Error ? err.message : "A network error occurred. Please try again.");
     } finally {
       setCreatingType(null);
     }
