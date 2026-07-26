@@ -9,6 +9,7 @@ export interface Settings {
   fontFamily: string | null;
   seoTitle: string | null;
   seoDescription: string | null;
+  logoUrl?: string | null;
 }
 
 interface SettingsFormProps {
@@ -37,9 +38,54 @@ export function SettingsForm({ portfolioId: _portfolioId, initialSettings, onSav
   const [fontFamily, setFontFamily] = useState(initialSettings?.fontFamily || "sans");
   const [seoTitle, setSeoTitle] = useState(initialSettings?.seoTitle || "");
   const [seoDescription, setSeoDescription] = useState(initialSettings?.seoDescription || "");
+  const [logoUrl, setLogoUrl] = useState(initialSettings?.logoUrl || "");
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const maxFileSize = 5 * 1024 * 1024;
+    if (file.size > maxFileSize) {
+      setError("Logo file size exceeds 5MB limit");
+      return;
+    }
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      setError("Only JPEG, PNG and WEBP images are allowed");
+      return;
+    }
+
+    setIsUploadingLogo(true);
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to upload logo");
+      }
+
+      const data = await res.json();
+      setLogoUrl(data.secure_url);
+    } catch (err) {
+      console.error("Logo upload error:", err);
+      setError(err instanceof Error ? err.message : "Failed to upload logo");
+    } finally {
+      setIsUploadingLogo(false);
+      e.target.value = "";
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +104,7 @@ export function SettingsForm({ portfolioId: _portfolioId, initialSettings, onSav
           fontFamily,
           seoTitle,
           seoDescription,
+          logoUrl: logoUrl || "",
         }),
       });
 
@@ -114,6 +161,68 @@ export function SettingsForm({ portfolioId: _portfolioId, initialSettings, onSav
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Logo Upload */}
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-zinc-400 block">Portfolio Logo</label>
+          <div className="flex items-center gap-4 bg-zinc-950/40 border border-zinc-800/80 p-3 rounded-xl">
+            {/* Preview */}
+            {logoUrl ? (
+              <div className="relative w-14 h-14 rounded-xl overflow-hidden border border-zinc-700 bg-zinc-950 shrink-0">
+                <img src={logoUrl} alt="Logo Preview" className="w-full h-full object-contain" />
+                <button
+                  type="button"
+                  onClick={() => setLogoUrl("")}
+                  disabled={isSaving || isUploadingLogo}
+                  className="absolute inset-0 bg-black/60 opacity-0 hover:opacity-100 transition flex items-center justify-center text-red-400 font-bold text-[10px] cursor-pointer"
+                >
+                  Remove
+                </button>
+              </div>
+            ) : (
+              <div className="w-14 h-14 rounded-xl border border-dashed border-zinc-700 flex items-center justify-center text-zinc-600 text-[9px] bg-zinc-950/20 shrink-0 select-none text-center leading-tight">
+                No Logo
+              </div>
+            )}
+
+            {/* URL input + upload button */}
+            <div className="flex-1 flex gap-2">
+              <input
+                id="logo-url"
+                type="text"
+                value={logoUrl}
+                onChange={(e) => setLogoUrl(e.target.value)}
+                disabled={isSaving || isUploadingLogo}
+                className="flex-1 bg-zinc-900/60 border border-zinc-800/80 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg px-3 py-2 text-xs text-zinc-200 transition outline-none placeholder:text-zinc-600 disabled:opacity-50"
+                placeholder="Logo URL or upload..."
+              />
+              <label className="relative shrink-0">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handleLogoUpload}
+                  disabled={isSaving || isUploadingLogo}
+                  className="hidden"
+                />
+                <span
+                  className={`bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold text-xs py-2 px-3 rounded-lg border border-zinc-700/60 transition cursor-pointer flex items-center gap-1.5 h-full ${
+                    isUploadingLogo ? "opacity-50 pointer-events-none" : ""
+                  }`}
+                >
+                  {isUploadingLogo ? (
+                    <div className="w-3.5 h-3.5 border-2 border-zinc-300/30 border-t-zinc-300 rounded-full animate-spin" />
+                  ) : (
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                  )}
+                  Upload
+                </span>
+              </label>
+            </div>
+          </div>
+          <p className="text-[10px] text-zinc-500">Displayed in your portfolio header. JPEG, PNG or WEBP, max 5 MB.</p>
+        </div>
+
         {/* Theme Color Selection */}
         <div className="space-y-2">
           <label className="text-xs font-semibold text-zinc-400 block">Theme Primary Color</label>
