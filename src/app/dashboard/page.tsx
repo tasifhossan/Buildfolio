@@ -2,6 +2,8 @@ import { getCurrentUserPortfolio } from "@/lib/get-current-user-portfolio";
 import { DashboardClient } from "./dashboard-client";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   try {
     const portfolio = await getCurrentUserPortfolio();
