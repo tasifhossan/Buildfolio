@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
 
 const visibilitySchema = z.object({
   isVisible: z.boolean({
@@ -83,6 +84,8 @@ export async function PATCH(req: Request, { params }: RouteParams) {
       where: { id: sectionId },
       data: { isVisible },
     });
+
+    revalidatePath(`/${portfolio.slug}`);
 
     return NextResponse.json(updatedSection);
   } catch (error) {

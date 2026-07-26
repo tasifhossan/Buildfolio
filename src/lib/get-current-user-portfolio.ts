@@ -23,6 +23,7 @@ export async function getCurrentUserPortfolio() {
           order: "asc",
         },
       },
+      settings: true,
     },
   });
 

@@ -172,7 +172,7 @@ export function SectionList() {
     setEditError(null);
   };
 
-  const handleSaveSectionContent = async (updatedContent: any) => {
+  const handleSaveSectionContent = async (updatedContent: unknown) => {
     if (!editingSection) return;
     setIsSavingSection(true);
     setEditError(null);

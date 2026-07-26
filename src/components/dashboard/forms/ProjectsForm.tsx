@@ -154,7 +154,7 @@ export function ProjectsForm({ section, onSave, isSaving = false }: ProjectsForm
 
         {list.length === 0 ? (
           <div className="text-center py-8 bg-zinc-950/20 border border-dashed border-zinc-800/50 rounded-xl">
-            <p className="text-xs text-zinc-500 italic">No projects listed yet. Click 'Add Project' to begin.</p>
+            <p className="text-xs text-zinc-500 italic">No projects listed yet. Click &apos;Add Project&apos; to begin.</p>
           </div>
         ) : (
           <div className="space-y-4">

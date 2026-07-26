@@ -1,6 +1,7 @@
 import type { NextAuthConfig } from "next-auth";
 
 export const authConfig = {
+  secret: process.env.AUTH_SECRET,
   providers: [], // Configured with actual providers in auth.ts to keep this configuration Edge-compatible
   pages: {
     signIn: "/login",

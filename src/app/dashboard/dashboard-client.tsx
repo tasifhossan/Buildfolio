@@ -5,6 +5,7 @@ import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { getPortfolioUrl } from "@/lib/get-portfolio-url";
 import { SectionList } from "@/components/dashboard/SectionList";
+import { SettingsForm, Settings } from "@/components/dashboard/SettingsForm";
 
 interface HeroContent {
   title?: string;
@@ -44,6 +45,7 @@ interface Portfolio {
   templateId: string | null;
   createdAt: Date | string;
   sections: Section[];
+  settings: Settings | null;
 }
 
 interface Template {
@@ -62,6 +64,7 @@ interface DashboardClientProps {
 export function DashboardClient({ initialPortfolio }: DashboardClientProps) {
   const router = useRouter();
   const [portfolio, setPortfolio] = useState<Portfolio>(initialPortfolio);
+  const [activeTab, setActiveTab] = useState<"sections" | "settings">("sections");
   const [showTemplateSelector, setShowTemplateSelector] = useState(
     portfolio.sections.length === 0
   );
@@ -358,8 +361,44 @@ export function DashboardClient({ initialPortfolio }: DashboardClientProps) {
               </div>
             </div>
 
-            {/* Sections List */}
-            <SectionList key={refreshKey} />
+            {/* Tab Switched Content */}
+            <div className="flex border-b border-zinc-800/80 mb-6">
+              <button
+                onClick={() => setActiveTab("sections")}
+                className={`py-2.5 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition duration-150 cursor-pointer ${
+                  activeTab === "sections"
+                    ? "border-indigo-500 text-indigo-400"
+                    : "border-transparent text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                Sections
+              </button>
+              <button
+                onClick={() => setActiveTab("settings")}
+                className={`py-2.5 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition duration-150 cursor-pointer ${
+                  activeTab === "settings"
+                    ? "border-indigo-500 text-indigo-400"
+                    : "border-transparent text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                Settings
+              </button>
+            </div>
+
+            {activeTab === "sections" ? (
+              <SectionList key={refreshKey} />
+            ) : (
+              <SettingsForm
+                portfolioId={portfolio.id}
+                initialSettings={portfolio.settings}
+                onSaveSuccess={(newSettings) => {
+                  setPortfolio((prev) => ({
+                    ...prev,
+                    settings: newSettings,
+                  }));
+                }}
+              />
+            )}
           </div>
         )}
       </main>

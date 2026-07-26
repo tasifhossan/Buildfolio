@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     // Upload to Cloudinary folder 'buildfolio/projects/{userId}'
     const folder = `buildfolio/projects/${session.user.id}`;
     
-    const result = await new Promise<any>((resolve, reject) => {
+    const result = await new Promise<{ secure_url: string } | undefined>((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder,
@@ -62,7 +62,7 @@ export async function POST(req: Request) {
       uploadStream.end(buffer);
     });
 
-    return NextResponse.json({ secure_url: result.secure_url });
+    return NextResponse.json({ secure_url: result?.secure_url });
   } catch (error) {
     console.error("Cloudinary upload error:", error);
     return NextResponse.json(

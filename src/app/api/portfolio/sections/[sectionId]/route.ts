@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
 
 const HeroContentSchema = z.object({
   title: z.string().optional(),
@@ -133,6 +134,8 @@ export async function PATCH(req: Request, { params }: RouteParams) {
       },
     });
 
+    revalidatePath(`/${portfolio.slug}`);
+
     return NextResponse.json(updatedSection);
   } catch (error) {
     console.error("Error updating section:", error);
@@ -192,6 +195,8 @@ export async function DELETE(req: Request, { params }: RouteParams) {
     await prisma.section.delete({
       where: { id: sectionId },
     });
+
+    revalidatePath(`/${portfolio.slug}`);
 
     return NextResponse.json({ success: true, message: "Section deleted successfully" });
   } catch (error) {

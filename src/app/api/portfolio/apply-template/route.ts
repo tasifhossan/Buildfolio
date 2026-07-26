@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
 
 const applyTemplateSchema = z.object({
   templateId: z.string({
@@ -101,6 +102,8 @@ export async function POST(req: Request) {
         },
       });
     });
+
+    revalidatePath(`/${portfolio.slug}`);
 
     return NextResponse.json(updatedPortfolio);
   } catch (error) {

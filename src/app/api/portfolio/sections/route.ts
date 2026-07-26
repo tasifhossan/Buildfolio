@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
 
 const createSectionSchema = z.object({
   type: z.string().min(1, "Type is required").refine(
@@ -103,6 +104,8 @@ export async function POST(req: Request) {
         content,
       },
     });
+
+    revalidatePath(`/${portfolio.slug}`);
 
     return NextResponse.json(newSection, { status: 201 });
   } catch (error) {
