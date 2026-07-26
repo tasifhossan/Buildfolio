@@ -1,5 +1,9 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Buildfolio — Build Your Portfolio in Minutes",
@@ -7,7 +11,11 @@ export const metadata: Metadata = {
     "Pick a template, customize your sections, and share your own portfolio page — no code required.",
 };
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
+  if (session?.user?.id) {
+    redirect("/dashboard");
+  }
   return (
     <div
       className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden font-sans"
