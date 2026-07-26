@@ -8,15 +8,15 @@ export interface AboutContent {
 }
 
 interface AboutFormProps {
-  content: AboutContent;
+  value: AboutContent;
   onChange: (updatedContent: AboutContent) => void;
   onSave: (updatedContent: AboutContent) => void | Promise<void>;
   isSaving?: boolean;
 }
 
-export function AboutForm({ content, onChange, onSave, isSaving = false }: AboutFormProps) {
-  const bio = content.bio ?? "";
-  const skills = content.skills ?? [];
+export function AboutForm({ value, onChange, onSave, isSaving = false }: AboutFormProps) {
+  const bio = value.bio ?? "";
+  const skills = value.skills ?? [];
   const [newSkill, setNewSkill] = useState("");
 
   const handleAddSkill = (e: React.MouseEvent | React.KeyboardEvent) => {
@@ -24,7 +24,7 @@ export function AboutForm({ content, onChange, onSave, isSaving = false }: About
     const trimmed = newSkill.trim();
     if (trimmed && !skills.includes(trimmed)) {
       onChange({
-        ...content,
+        ...value,
         skills: [...skills, trimmed],
       });
       setNewSkill("");
@@ -33,21 +33,21 @@ export function AboutForm({ content, onChange, onSave, isSaving = false }: About
 
   const handleRemoveSkill = (skillToRemove: string) => {
     onChange({
-      ...content,
+      ...value,
       skills: skills.filter((s) => s !== skillToRemove),
     });
   };
 
-  const handleBioChange = (value: string) => {
+  const handleBioChange = (val: string) => {
     onChange({
-      ...content,
-      bio: value,
+      ...value,
+      bio: val,
     });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(content);
+    onSave(value);
   };
 
   return (

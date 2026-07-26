@@ -26,15 +26,15 @@ export interface Section {
 }
 
 interface ProjectsFormProps {
-  content: ProjectsContent;
+  value: ProjectsContent;
   onChange: (updatedContent: ProjectsContent) => void;
   onSave: (updatedContent: ProjectsContent) => void | Promise<void>;
   isSaving?: boolean;
 }
 
-export function ProjectsForm({ content, onChange, onSave, isSaving = false }: ProjectsFormProps) {
-  const title = content.title ?? "Projects";
-  const list = content.list || content.items || [];
+export function ProjectsForm({ value, onChange, onSave, isSaving = false }: ProjectsFormProps) {
+  const title = value.title ?? "Projects";
+  const list = value.list || value.items || [];
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
 
   const handleImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,7 +83,7 @@ export function ProjectsForm({ content, onChange, onSave, isSaving = false }: Pr
   const handleAddItem = () => {
     const updated = [...list, { name: "", title: "", description: "", link: "" }];
     onChange({
-      ...content,
+      ...value,
       list: updated,
       items: updated,
     });
@@ -92,25 +92,25 @@ export function ProjectsForm({ content, onChange, onSave, isSaving = false }: Pr
   const handleRemoveItem = (indexToRemove: number) => {
     const updated = list.filter((_, idx) => idx !== indexToRemove);
     onChange({
-      ...content,
+      ...value,
       list: updated,
       items: updated,
     });
   };
 
-  const handleItemChange = (index: number, field: keyof ProjectItem, value: string) => {
+  const handleItemChange = (index: number, field: keyof ProjectItem, val: string) => {
     const updated = list.map((item, idx) => {
       if (idx === index) {
-        const updatedItem = { ...item, [field]: value };
+        const updatedItem = { ...item, [field]: val };
         // Keep both name and title in sync for maximum safety
-        if (field === "name") updatedItem.title = value;
-        if (field === "title") updatedItem.name = value;
+        if (field === "name") updatedItem.title = val;
+        if (field === "title") updatedItem.name = val;
         return updatedItem;
       }
       return item;
     });
     onChange({
-      ...content,
+      ...value,
       list: updated,
       items: updated,
     });
@@ -118,14 +118,14 @@ export function ProjectsForm({ content, onChange, onSave, isSaving = false }: Pr
 
   const handleTitleChange = (val: string) => {
     onChange({
-      ...content,
+      ...value,
       title: val,
     });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(content);
+    onSave(value);
   };
 
   return (

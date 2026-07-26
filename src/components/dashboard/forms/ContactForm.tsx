@@ -10,28 +10,28 @@ export interface ContactContent {
 }
 
 interface ContactFormProps {
-  content: ContactContent;
+  value: ContactContent;
   onChange: (updatedContent: ContactContent) => void;
   onSave: (updatedContent: ContactContent) => void | Promise<void>;
   isSaving?: boolean;
 }
 
-export function ContactForm({ content, onChange, onSave, isSaving = false }: ContactFormProps) {
-  const title = content.title ?? "";
-  const email = content.email ?? "";
-  const github = content.github ?? "";
-  const linkedin = content.linkedin ?? "";
+export function ContactForm({ value, onChange, onSave, isSaving = false }: ContactFormProps) {
+  const title = value.title ?? "";
+  const email = value.email ?? "";
+  const github = value.github ?? "";
+  const linkedin = value.linkedin ?? "";
 
-  const handleChange = (field: keyof ContactContent, value: string) => {
+  const handleChange = (field: keyof ContactContent, val: string) => {
     onChange({
-      ...content,
-      [field]: value,
+      ...value,
+      [field]: val,
     });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(content);
+    onSave(value);
   };
 
   return (

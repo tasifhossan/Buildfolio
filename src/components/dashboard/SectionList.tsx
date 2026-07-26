@@ -5,7 +5,7 @@ import { HeroForm } from "./forms/HeroForm";
 import { AboutForm } from "./forms/AboutForm";
 import { ContactForm } from "./forms/ContactForm";
 import { ProjectsForm } from "./forms/ProjectsForm";
-import { SectionRenderer } from "../portfolio/SectionRenderer";
+import { SectionRenderer, HeroContent, AboutContent, ContactContent, ProjectsContent } from "../portfolio/SectionRenderer";
 import {
   DndContext,
   closestCenter,
@@ -165,7 +165,7 @@ export function SectionList() {
 
   // Edit modal state
   const [editingSection, setEditingSection] = useState<Section | null>(null);
-  const [draftContent, setDraftContent] = useState<any>(null);
+  const [draftContent, setDraftContent] = useState<unknown>(null);
   const [isSavingSection, setIsSavingSection] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
 
@@ -605,28 +605,28 @@ export function SectionList() {
 
                   {editingSection.type === "Hero" ? (
                     <HeroForm
-                      content={draftContent}
+                      value={draftContent as HeroContent}
                       onChange={setDraftContent}
                       isSaving={isSavingSection}
                       onSave={handleSaveSectionContent}
                     />
                   ) : editingSection.type === "About" ? (
                     <AboutForm
-                      content={draftContent}
+                      value={draftContent as AboutContent}
                       onChange={setDraftContent}
                       isSaving={isSavingSection}
                       onSave={handleSaveSectionContent}
                     />
                   ) : editingSection.type === "Contact" ? (
                     <ContactForm
-                      content={draftContent}
+                      value={draftContent as ContactContent}
                       onChange={setDraftContent}
                       isSaving={isSavingSection}
                       onSave={handleSaveSectionContent}
                     />
                   ) : editingSection.type === "Projects" ? (
                     <ProjectsForm
-                      content={draftContent}
+                      value={draftContent as ProjectsContent}
                       onChange={setDraftContent}
                       isSaving={isSavingSection}
                       onSave={handleSaveSectionContent}

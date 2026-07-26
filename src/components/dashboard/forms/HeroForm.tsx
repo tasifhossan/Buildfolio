@@ -9,27 +9,27 @@ export interface HeroContent {
 }
 
 interface HeroFormProps {
-  content: HeroContent;
+  value: HeroContent;
   onChange: (updatedContent: HeroContent) => void;
   onSave: (updatedContent: HeroContent) => void | Promise<void>;
   isSaving?: boolean;
 }
 
-export function HeroForm({ content, onChange, onSave, isSaving = false }: HeroFormProps) {
-  const title = content.title ?? "";
-  const subtitle = content.subtitle ?? "";
-  const ctaText = content.ctaText ?? "";
+export function HeroForm({ value, onChange, onSave, isSaving = false }: HeroFormProps) {
+  const title = value.title ?? "";
+  const subtitle = value.subtitle ?? "";
+  const ctaText = value.ctaText ?? "";
 
-  const handleChange = (field: keyof HeroContent, value: string) => {
+  const handleChange = (field: keyof HeroContent, val: string) => {
     onChange({
-      ...content,
-      [field]: value,
+      ...value,
+      [field]: val,
     });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(content);
+    onSave(value);
   };
 
   return (
