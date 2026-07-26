@@ -65,7 +65,72 @@ Foreign keys use cascading deletes, and indexes are set on `slug` and all foreig
 - **On-demand revalidation** — every content-changing endpoint (section CRUD, reorder, apply-template, settings) triggers `revalidatePath`, verified to update the public page within seconds against an actual production build (`next build && next start`), not just dev mode
 - **Live preview** — split-pane editor showing unsaved draft content rendered through the same public-facing components in real time, confirmed to never persist until "Save" is explicitly clicked
 
+## Deployment Notes
+
+- Designed for **Vercel free tier** deployment for an initial small-scale pilot (5–10 users)
+- Domain-agnostic: subdomain routing is driven entirely by `NEXT_PUBLIC_ROOT_DOMAIN`, so buying a real domain later is a config change, not a code change
+- Wildcard subdomains require nameserver control of an owned domain and are supported on Vercel's free Hobby tier; Vercel's own `*.vercel.app` domain cannot support arbitrary per-tenant subdomains
+- Requires a unique, freshly generated `AUTH_SECRET` for any deployed environment (never reuse a local dev secret)
 
 ## Up Next
 
--Full-portfolio preview mode (view the entire live-styled portfolio without leaving the dashboard)
+- Deploy to Vercel for the initial pilot (path-based portfolio links until a domain is purchased)
+- Optional: full-portfolio preview mode (view the entire live-styled portfolio without leaving the dashboard)
+- Production hardening: rate limiting on signup/upload endpoints, error monitoring, root-domain landing page
+
+## Development Workflow
+
+This project uses a branching model to keep `main` stable for production:
+
+```
+main        → production (deployed to Vercel)
+develop     → integration branch (features merged here first, tested together)
+feature/*   → one branch per feature (e.g. feature/preloader, feature/logo-upload)
+```
+
+Feature work never lands directly on `main` or `develop` — each feature is built on its own `feature/*` branch, verified, then merged into `develop`. `develop` is merged into `main` only as a deliberate release step.
+
+## Roadmap — Advanced Features
+
+Beyond the core MVP (Phases 1–4), the following features have been identified for future development. None are built yet unless noted otherwise.
+
+**New section types**
+- Experience/Work History (timeline)
+- Education
+- Testimonials
+- Skills with proficiency bars/ratings
+- Blog/Articles feed
+- Image gallery
+- Certifications/Awards
+- Services/Pricing
+- Stats/counters
+- Custom HTML/Markdown block
+- Pre-footer (CTA banner before the footer)
+
+**Customization depth**
+- Multiple layout variants per section (e.g. Projects as grid/list/carousel)
+- Per-section background/spacing controls
+- Multiple font pairing options
+- Dark/light mode toggle per portfolio
+- Custom CSS injection (advanced — needs sanitization)
+
+**Branding & identity**
+- Logo upload (via Cloudinary, attached to Settings)
+- Custom/changeable username (slug), with availability checking and a reserved-word blocklist
+- 🔨 **Preloader** — branded fade-in loading screen (initials-based, later using uploaded logo), toggleable per-portfolio via Settings — *in progress on `feature/preloader`*
+
+**Sharing & distribution**
+- Custom domain support (bring-your-own-domain)
+- Portfolio analytics (views, referrer sources)
+- Resume/CV PDF export
+- Password-protected/private portfolios
+- Social share preview cards (OpenGraph images per portfolio)
+
+**Platform-level features**
+- Multiple portfolios per user (schema already supports this loosely via the existing one-to-many relation)
+- Draft vs. published states (instead of instant revalidation)
+- Team/collaborative editing
+- Template marketplace
+- SEO tools (sitemap generation, structured data/JSON-LD)
+- Custom, user-defined sections (larger initiative — effectively a mini page-builder, requires more validation/sanitization work)
+- Category-filterable project grids (e.g. mixitup-style filtering) — treated as a layout variant of the Projects section rather than a generic plugin system
