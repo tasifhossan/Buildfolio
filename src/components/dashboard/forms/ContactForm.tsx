@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React from "react";
 
 export interface ContactContent {
   title?: string;
@@ -9,36 +9,29 @@ export interface ContactContent {
   linkedin?: string;
 }
 
-export interface Section {
-  id: string;
-  portfolioId: string;
-  type: string;
-  order: number;
-  isVisible: boolean;
-  content: ContactContent;
-}
-
 interface ContactFormProps {
-  section: Section;
+  content: ContactContent;
+  onChange: (updatedContent: ContactContent) => void;
   onSave: (updatedContent: ContactContent) => void | Promise<void>;
   isSaving?: boolean;
 }
 
-export function ContactForm({ section, onSave, isSaving = false }: ContactFormProps) {
-  const initialContent = section.content || {};
-  const [title, setTitle] = useState(initialContent.title ?? "Contact");
-  const [email, setEmail] = useState(initialContent.email ?? "");
-  const [github, setGithub] = useState(initialContent.github ?? "");
-  const [linkedin, setLinkedin] = useState(initialContent.linkedin ?? "");
+export function ContactForm({ content, onChange, onSave, isSaving = false }: ContactFormProps) {
+  const title = content.title ?? "";
+  const email = content.email ?? "";
+  const github = content.github ?? "";
+  const linkedin = content.linkedin ?? "";
+
+  const handleChange = (field: keyof ContactContent, value: string) => {
+    onChange({
+      ...content,
+      [field]: value,
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
-      title,
-      email,
-      github,
-      linkedin,
-    });
+    onSave(content);
   };
 
   return (
@@ -51,7 +44,7 @@ export function ContactForm({ section, onSave, isSaving = false }: ContactFormPr
           id="contact-title"
           type="text"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => handleChange("title", e.target.value)}
           disabled={isSaving}
           className="w-full bg-zinc-950/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-xs text-zinc-100 transition duration-150 outline-none placeholder:text-zinc-600 disabled:opacity-50"
           placeholder="Contact"
@@ -66,7 +59,7 @@ export function ContactForm({ section, onSave, isSaving = false }: ContactFormPr
           id="contact-email"
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => handleChange("email", e.target.value)}
           disabled={isSaving}
           className="w-full bg-zinc-950/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-xs text-zinc-100 transition duration-150 outline-none placeholder:text-zinc-600 disabled:opacity-50"
           placeholder="hello@example.com"
@@ -81,7 +74,7 @@ export function ContactForm({ section, onSave, isSaving = false }: ContactFormPr
           id="contact-github"
           type="text"
           value={github}
-          onChange={(e) => setGithub(e.target.value)}
+          onChange={(e) => handleChange("github", e.target.value)}
           disabled={isSaving}
           className="w-full bg-zinc-950/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-xs text-zinc-100 transition duration-150 outline-none placeholder:text-zinc-600 disabled:opacity-50"
           placeholder="github.com/username"
@@ -96,7 +89,7 @@ export function ContactForm({ section, onSave, isSaving = false }: ContactFormPr
           id="contact-linkedin"
           type="text"
           value={linkedin}
-          onChange={(e) => setLinkedin(e.target.value)}
+          onChange={(e) => handleChange("linkedin", e.target.value)}
           disabled={isSaving}
           className="w-full bg-zinc-950/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-xs text-zinc-100 transition duration-150 outline-none placeholder:text-zinc-600 disabled:opacity-50"
           placeholder="linkedin.com/in/username"

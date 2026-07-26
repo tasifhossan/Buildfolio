@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React from "react";
 
 export interface HeroContent {
   title?: string;
@@ -8,34 +8,28 @@ export interface HeroContent {
   ctaText?: string;
 }
 
-export interface Section {
-  id: string;
-  portfolioId: string;
-  type: string;
-  order: number;
-  isVisible: boolean;
-  content: HeroContent;
-}
-
 interface HeroFormProps {
-  section: Section;
+  content: HeroContent;
+  onChange: (updatedContent: HeroContent) => void;
   onSave: (updatedContent: HeroContent) => void | Promise<void>;
   isSaving?: boolean;
 }
 
-export function HeroForm({ section, onSave, isSaving = false }: HeroFormProps) {
-  const initialContent = section.content || {};
-  const [title, setTitle] = useState(initialContent.title ?? "Welcome to my portfolio");
-  const [subtitle, setSubtitle] = useState(initialContent.subtitle ?? "I build high-quality digital experiences.");
-  const [ctaText, setCtaText] = useState(initialContent.ctaText ?? "");
+export function HeroForm({ content, onChange, onSave, isSaving = false }: HeroFormProps) {
+  const title = content.title ?? "";
+  const subtitle = content.subtitle ?? "";
+  const ctaText = content.ctaText ?? "";
+
+  const handleChange = (field: keyof HeroContent, value: string) => {
+    onChange({
+      ...content,
+      [field]: value,
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
-      title,
-      subtitle,
-      ctaText,
-    });
+    onSave(content);
   };
 
   return (
@@ -48,7 +42,7 @@ export function HeroForm({ section, onSave, isSaving = false }: HeroFormProps) {
           id="hero-title"
           type="text"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => handleChange("title", e.target.value)}
           disabled={isSaving}
           className="w-full bg-zinc-950/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-xs text-zinc-100 transition duration-150 outline-none placeholder:text-zinc-600 disabled:opacity-50"
           placeholder="Welcome to my portfolio"
@@ -62,7 +56,7 @@ export function HeroForm({ section, onSave, isSaving = false }: HeroFormProps) {
         <textarea
           id="hero-subtitle"
           value={subtitle}
-          onChange={(e) => setSubtitle(e.target.value)}
+          onChange={(e) => handleChange("subtitle", e.target.value)}
           disabled={isSaving}
           rows={3}
           className="w-full bg-zinc-950/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-xs text-zinc-100 transition duration-150 outline-none placeholder:text-zinc-600 disabled:opacity-50 resize-none"
@@ -78,7 +72,7 @@ export function HeroForm({ section, onSave, isSaving = false }: HeroFormProps) {
           id="hero-cta"
           type="text"
           value={ctaText}
-          onChange={(e) => setCtaText(e.target.value)}
+          onChange={(e) => handleChange("ctaText", e.target.value)}
           disabled={isSaving}
           className="w-full bg-zinc-950/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-xs text-zinc-100 transition duration-150 outline-none placeholder:text-zinc-600 disabled:opacity-50"
           placeholder="e.g. View Projects"

@@ -7,46 +7,47 @@ export interface AboutContent {
   skills?: string[];
 }
 
-export interface Section {
-  id: string;
-  portfolioId: string;
-  type: string;
-  order: number;
-  isVisible: boolean;
-  content: AboutContent;
-}
-
 interface AboutFormProps {
-  section: Section;
+  content: AboutContent;
+  onChange: (updatedContent: AboutContent) => void;
   onSave: (updatedContent: AboutContent) => void | Promise<void>;
   isSaving?: boolean;
 }
 
-export function AboutForm({ section, onSave, isSaving = false }: AboutFormProps) {
-  const initialContent = section.content || {};
-  const [bio, setBio] = useState(initialContent.bio ?? "No biography provided yet.");
-  const [skills, setSkills] = useState<string[]>(initialContent.skills ?? []);
+export function AboutForm({ content, onChange, onSave, isSaving = false }: AboutFormProps) {
+  const bio = content.bio ?? "";
+  const skills = content.skills ?? [];
   const [newSkill, setNewSkill] = useState("");
 
   const handleAddSkill = (e: React.MouseEvent | React.KeyboardEvent) => {
     e.preventDefault();
     const trimmed = newSkill.trim();
     if (trimmed && !skills.includes(trimmed)) {
-      setSkills((prev) => [...prev, trimmed]);
+      onChange({
+        ...content,
+        skills: [...skills, trimmed],
+      });
       setNewSkill("");
     }
   };
 
   const handleRemoveSkill = (skillToRemove: string) => {
-    setSkills((prev) => prev.filter((s) => s !== skillToRemove));
+    onChange({
+      ...content,
+      skills: skills.filter((s) => s !== skillToRemove),
+    });
+  };
+
+  const handleBioChange = (value: string) => {
+    onChange({
+      ...content,
+      bio: value,
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
-      bio,
-      skills,
-    });
+    onSave(content);
   };
 
   return (
@@ -58,7 +59,7 @@ export function AboutForm({ section, onSave, isSaving = false }: AboutFormProps)
         <textarea
           id="about-bio"
           value={bio}
-          onChange={(e) => setBio(e.target.value)}
+          onChange={(e) => handleBioChange(e.target.value)}
           disabled={isSaving}
           rows={4}
           className="w-full bg-zinc-950/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-xs text-zinc-100 transition duration-150 outline-none placeholder:text-zinc-600 disabled:opacity-50 resize-none"

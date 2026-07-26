@@ -5,6 +5,7 @@ import { HeroForm } from "./forms/HeroForm";
 import { AboutForm } from "./forms/AboutForm";
 import { ContactForm } from "./forms/ContactForm";
 import { ProjectsForm } from "./forms/ProjectsForm";
+import { SectionRenderer } from "../portfolio/SectionRenderer";
 import {
   DndContext,
   closestCenter,
@@ -164,11 +165,13 @@ export function SectionList() {
 
   // Edit modal state
   const [editingSection, setEditingSection] = useState<Section | null>(null);
+  const [draftContent, setDraftContent] = useState<any>(null);
   const [isSavingSection, setIsSavingSection] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
 
   const handleEditClick = (section: Section) => {
     setEditingSection(section);
+    setDraftContent(section.content || {});
     setEditError(null);
   };
 
@@ -570,67 +573,91 @@ export function SectionList() {
       {/* Custom Edit Modal with Glassmorphism */}
       {editingSection && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]">
-          <div className="max-w-lg w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl space-y-6 animate-[scaleIn_0.2s_ease-out]">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-              <h3 className="text-base font-bold text-zinc-100 flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
-                Edit {editingSection.type} Section
-              </h3>
-              <button
-                onClick={() => setEditingSection(null)}
-                disabled={isSavingSection}
-                className="text-zinc-500 hover:text-zinc-300 transition cursor-pointer disabled:opacity-50"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+          <div className="max-w-5xl w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl space-y-6 animate-[scaleIn_0.2s_ease-out]">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+              {/* Left Pane - Form */}
+              <div className="space-y-6 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between border-b border-zinc-800 pb-3 mb-4">
+                    <h3 className="text-base font-bold text-zinc-100 flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                      Edit {editingSection.type} Section
+                    </h3>
+                    <button
+                      onClick={() => setEditingSection(null)}
+                      disabled={isSavingSection}
+                      className="text-zinc-500 hover:text-zinc-300 transition cursor-pointer disabled:opacity-50"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {editError && (
+                    <div className="bg-red-950/30 border border-red-900/30 text-red-400 px-4 py-3 rounded-xl text-xs flex items-start gap-2.5 mb-4">
+                      <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>{editError}</span>
+                    </div>
+                  )}
+
+                  {editingSection.type === "Hero" ? (
+                    <HeroForm
+                      content={draftContent}
+                      onChange={setDraftContent}
+                      isSaving={isSavingSection}
+                      onSave={handleSaveSectionContent}
+                    />
+                  ) : editingSection.type === "About" ? (
+                    <AboutForm
+                      content={draftContent}
+                      onChange={setDraftContent}
+                      isSaving={isSavingSection}
+                      onSave={handleSaveSectionContent}
+                    />
+                  ) : editingSection.type === "Contact" ? (
+                    <ContactForm
+                      content={draftContent}
+                      onChange={setDraftContent}
+                      isSaving={isSavingSection}
+                      onSave={handleSaveSectionContent}
+                    />
+                  ) : editingSection.type === "Projects" ? (
+                    <ProjectsForm
+                      content={draftContent}
+                      onChange={setDraftContent}
+                      isSaving={isSavingSection}
+                      onSave={handleSaveSectionContent}
+                    />
+                  ) : (
+                    <div className="text-center py-6 space-y-2">
+                      <p className="text-xs text-zinc-400">Editor for {editingSection.type} section is coming soon.</p>
+                      <button
+                        onClick={() => setEditingSection(null)}
+                        className="bg-zinc-800 text-zinc-300 hover:bg-zinc-700 px-4 py-2 rounded-xl text-xs transition font-semibold"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Right Pane - Live Preview */}
+              <div className="bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden shadow-inner flex flex-col min-h-[350px] lg:min-h-[500px]">
+                <div className="bg-zinc-900/60 px-4 py-2.5 border-b border-zinc-800/80 flex items-center gap-1.5 shrink-0 select-none">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-500/80"></span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+                  <span className="text-[10px] text-zinc-500 font-mono ml-2 tracking-wide uppercase">Live Preview (Unsaved)</span>
+                </div>
+                <div className="flex-1 overflow-y-auto p-6 bg-[#09090b]">
+                  <SectionRenderer section={{ type: editingSection.type, content: draftContent }} />
+                </div>
+              </div>
             </div>
-
-            {editError && (
-              <div className="bg-red-950/30 border border-red-900/30 text-red-400 px-4 py-3 rounded-xl text-xs flex items-start gap-2.5">
-                <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{editError}</span>
-              </div>
-            )}
-
-            {editingSection.type === "Hero" ? (
-              <HeroForm
-                section={editingSection}
-                isSaving={isSavingSection}
-                onSave={handleSaveSectionContent}
-              />
-            ) : editingSection.type === "About" ? (
-              <AboutForm
-                section={editingSection}
-                isSaving={isSavingSection}
-                onSave={handleSaveSectionContent}
-              />
-            ) : editingSection.type === "Contact" ? (
-              <ContactForm
-                section={editingSection}
-                isSaving={isSavingSection}
-                onSave={handleSaveSectionContent}
-              />
-            ) : editingSection.type === "Projects" ? (
-              <ProjectsForm
-                section={editingSection}
-                isSaving={isSavingSection}
-                onSave={handleSaveSectionContent}
-              />
-            ) : (
-              <div className="text-center py-6 space-y-2">
-                <p className="text-xs text-zinc-400">Editor for {editingSection.type} section is coming soon.</p>
-                <button
-                  onClick={() => setEditingSection(null)}
-                  className="bg-zinc-800 text-zinc-300 hover:bg-zinc-700 px-4 py-2 rounded-xl text-xs transition font-semibold"
-                >
-                  Close
-                </button>
-              </div>
-            )}
           </div>
         </div>
       )}

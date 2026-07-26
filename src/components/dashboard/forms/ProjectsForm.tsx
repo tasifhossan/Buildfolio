@@ -26,17 +26,15 @@ export interface Section {
 }
 
 interface ProjectsFormProps {
-  section: Section;
+  content: ProjectsContent;
+  onChange: (updatedContent: ProjectsContent) => void;
   onSave: (updatedContent: ProjectsContent) => void | Promise<void>;
   isSaving?: boolean;
 }
 
-export function ProjectsForm({ section, onSave, isSaving = false }: ProjectsFormProps) {
-  const initialContent = section.content || {};
-  const [title, setTitle] = useState(initialContent.title ?? "Projects");
-  const [list, setList] = useState<ProjectItem[]>(
-    initialContent.list || initialContent.items || []
-  );
+export function ProjectsForm({ content, onChange, onSave, isSaving = false }: ProjectsFormProps) {
+  const title = content.title ?? "Projects";
+  const list = content.list || content.items || [];
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
 
   const handleImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,38 +81,51 @@ export function ProjectsForm({ section, onSave, isSaving = false }: ProjectsForm
   };
 
   const handleAddItem = () => {
-    setList((prev) => [
-      ...prev,
-      { name: "", title: "", description: "", link: "" },
-    ]);
+    const updated = [...list, { name: "", title: "", description: "", link: "" }];
+    onChange({
+      ...content,
+      list: updated,
+      items: updated,
+    });
   };
 
   const handleRemoveItem = (indexToRemove: number) => {
-    setList((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+    const updated = list.filter((_, idx) => idx !== indexToRemove);
+    onChange({
+      ...content,
+      list: updated,
+      items: updated,
+    });
   };
 
   const handleItemChange = (index: number, field: keyof ProjectItem, value: string) => {
-    setList((prev) =>
-      prev.map((item, idx) => {
-        if (idx === index) {
-          const updated = { ...item, [field]: value };
-          // Keep both name and title in sync for maximum safety
-          if (field === "name") updated.title = value;
-          if (field === "title") updated.name = value;
-          return updated;
-        }
-        return item;
-      })
-    );
+    const updated = list.map((item, idx) => {
+      if (idx === index) {
+        const updatedItem = { ...item, [field]: value };
+        // Keep both name and title in sync for maximum safety
+        if (field === "name") updatedItem.title = value;
+        if (field === "title") updatedItem.name = value;
+        return updatedItem;
+      }
+      return item;
+    });
+    onChange({
+      ...content,
+      list: updated,
+      items: updated,
+    });
+  };
+
+  const handleTitleChange = (val: string) => {
+    onChange({
+      ...content,
+      title: val,
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
-      title,
-      list,
-      items: list,
-    });
+    onSave(content);
   };
 
   return (
@@ -128,7 +139,7 @@ export function ProjectsForm({ section, onSave, isSaving = false }: ProjectsForm
           id="projects-title"
           type="text"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => handleTitleChange(e.target.value)}
           disabled={isSaving}
           className="w-full bg-zinc-950/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-xs text-zinc-100 transition duration-150 outline-none placeholder:text-zinc-600 disabled:opacity-50"
           placeholder="Projects"
