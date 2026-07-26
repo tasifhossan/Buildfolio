@@ -1,8 +1,14 @@
 import { getCurrentUserPortfolio } from "@/lib/get-current-user-portfolio";
 import { DashboardClient } from "./dashboard-client";
 import Link from "next/link";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description: "Manage your portfolio sections, content, and settings.",
+};
 
 export default async function DashboardPage() {
   try {

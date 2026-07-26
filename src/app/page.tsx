@@ -1,4 +1,10 @@
 import Image from "next/image";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Buildfolio",
+  description: "Build and share your personal portfolio — choose a template, edit sections, and go live in minutes.",
+};
 
 export default function Home() {
   return (
