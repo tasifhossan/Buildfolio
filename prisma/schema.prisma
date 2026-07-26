@@ -100,6 +100,7 @@ model Settings {
   fontFamily     String?
   seoTitle       String?
   seoDescription String?
+  logoUrl        String?
 }
 
 model Template {
