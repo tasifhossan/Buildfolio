@@ -1,16 +1,11 @@
 /**
- * Domains that do NOT support wildcard subdomains.
+ * Platform preview domains that do NOT support wildcard subdomains.
  * On these we fall back to path-based URLs: rootDomain/slug
  *
- * - *.vercel.app / *.netlify.app / *.pages.dev  — platform preview domains
- * - localhost* — browsers don't resolve alice.localhost reliably
+ * Once a real custom domain is configured, subdomain routing kicks in
+ * automatically — no code changes needed.
  */
-const NO_WILDCARD_SUFFIXES = [
-  ".vercel.app",
-  ".netlify.app",
-  ".pages.dev",
-  "localhost",
-];
+const NO_WILDCARD_SUFFIXES = [".vercel.app", ".netlify.app", ".pages.dev"];
 
 /**
  * Generates the public URL for a portfolio slug.
@@ -22,8 +17,9 @@ const NO_WILDCARD_SUFFIXES = [
  *  3. Hard fallback: `"localhost:3000"`
  *
  * URL style:
- *  - Custom domain (e.g. `buildfolio.com`) → `https://slug.buildfolio.com`
- *  - Platform / localhost                  → `https://project.vercel.app/slug`
+ *  - localhost / custom domain → subdomain: `http://slug.localhost:3000`
+ *                                            `https://slug.buildfolio.com`
+ *  - Platform preview domain  → path-based: `https://project.vercel.app/slug`
  */
 export function getPortfolioUrl(slug: string): string {
   // 1. Prefer the explicitly configured root domain
@@ -36,16 +32,15 @@ export function getPortfolioUrl(slug: string): string {
   const isLocalhost = rootDomain.startsWith("localhost");
   const protocol = isLocalhost ? "http" : "https";
 
-  const isNoWildcardDomain =
-    isLocalhost ||
-    NO_WILDCARD_SUFFIXES.some((suffix) => rootDomain.endsWith(suffix));
+  const isNoWildcardDomain = NO_WILDCARD_SUFFIXES.some((suffix) =>
+    rootDomain.endsWith(suffix)
+  );
 
   if (isNoWildcardDomain) {
-    // Path-based: https://project.vercel.app/slug  or  http://localhost:3000/slug
+    // Path-based fallback: https://project.vercel.app/slug
     return `${protocol}://${rootDomain}/${slug}`;
   }
 
-  // Subdomain-based: https://slug.buildfolio.com
+  // Subdomain-based: http://slug.localhost:3000  or  https://slug.buildfolio.com
   return `${protocol}://${slug}.${rootDomain}`;
 }
-
