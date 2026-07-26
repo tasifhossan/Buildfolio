@@ -16,6 +16,7 @@ const settingsSchema = z.object({
     .or(z.literal("")),
   seoTitle: z.string().max(100, "SEO Title cannot exceed 100 characters").optional().or(z.literal("")),
   seoDescription: z.string().max(200, "SEO Description cannot exceed 200 characters").optional().or(z.literal("")),
+  logoUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
 });
 
 export async function PATCH(req: Request) {
@@ -47,7 +48,7 @@ export async function PATCH(req: Request) {
       );
     }
 
-    const { themeColor, fontFamily, seoTitle, seoDescription } = parseResult.data;
+    const { themeColor, fontFamily, seoTitle, seoDescription, logoUrl } = parseResult.data;
 
     // Fetch user's portfolio to check ownership and get the slug
     const portfolio = await prisma.portfolio.findFirst({
@@ -69,6 +70,7 @@ export async function PATCH(req: Request) {
         fontFamily: fontFamily || null,
         seoTitle: seoTitle || null,
         seoDescription: seoDescription || null,
+        logoUrl: logoUrl || null,
       },
       create: {
         portfolioId: portfolio.id,
@@ -76,6 +78,7 @@ export async function PATCH(req: Request) {
         fontFamily: fontFamily || null,
         seoTitle: seoTitle || null,
         seoDescription: seoDescription || null,
+        logoUrl: logoUrl || null,
       },
     });
 
