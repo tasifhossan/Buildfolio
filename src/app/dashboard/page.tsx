@@ -21,6 +21,7 @@ export default async function DashboardPage() {
         initialPortfolio={{
           ...portfolio,
           createdAt: portfolio.createdAt.toISOString(),
+          slugUpdatedAt: portfolio.slugUpdatedAt ? portfolio.slugUpdatedAt.toISOString() : null,
         }}
       />
     );

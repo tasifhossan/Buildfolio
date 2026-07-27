@@ -29,6 +29,8 @@ Public portfolios are served via **subdomain-based routing** (`username.domain.c
 | `Settings` | Per-portfolio theme color, font, and SEO metadata |
 | `Template` | A named, selectable starting layout (e.g. "Minimal", "Developer") |
 | `TemplateSection` | Starter section content belonging to a `Template`, cloned into `Section` rows on selection |
+| `SlugHistory` | Records a portfolio's previous slugs so old URLs redirect cleanly after a username change |
+| `Account` / `Session` / `VerificationToken` | NextAuth adapter tables (present in schema for future OAuth/session-strategy flexibility; current auth uses Credentials + JWT sessions, so these are currently unused) |
 
 Foreign keys use cascading deletes, and indexes are set on `slug` and all foreign-key columns for query performance at scale.
 
@@ -115,9 +117,9 @@ Beyond the core MVP (Phases 1–4), the following features have been identified 
 - Custom CSS injection (advanced — needs sanitization)
 
 **Branding & identity**
-- Logo upload (via Cloudinary, attached to Settings)
-- Custom/changeable username (slug), with availability checking and a reserved-word blocklist
-- 🔨 **Preloader** — branded fade-in loading screen (initials-based, later using uploaded logo), toggleable per-portfolio via Settings — *in progress on `feature/preloader`*
+- ✅ **Logo upload** — via Cloudinary, attached to Settings, rendered in the preloader and (extendable to) other public-facing spots
+- ✅ **Custom/changeable username (slug)** — live availability checking, reserved-word blocklist (kept in sync with middleware's reserved app paths), 30-day change cooldown, and automatic redirect from old slug to new via a `SlugHistory` table
+- ✅ **Preloader** — branded fade-in loading screen (uses uploaded logo if set, otherwise initials derived from name or slug), toggleable per-portfolio via Settings, with a hard fallback timeout so it can never get stuck
 
 **Sharing & distribution**
 - Custom domain support (bring-your-own-domain)

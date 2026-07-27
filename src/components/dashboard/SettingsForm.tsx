@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export interface Settings {
   id?: string;
@@ -15,7 +15,10 @@ export interface Settings {
 interface SettingsFormProps {
   portfolioId: string;
   initialSettings: Settings | null;
+  slug: string;
+  slugUpdatedAt?: string | null;
   onSaveSuccess: (updatedSettings: Settings) => void;
+  onSlugChangeSuccess: (newSlug: string, newSlugUpdatedAt: string) => void;
 }
 
 const PRESET_COLORS = [
@@ -33,7 +36,14 @@ const FONT_OPTIONS = [
   { value: "mono", name: "Monospace (Minimalist / Tech)" },
 ];
 
-export function SettingsForm({ portfolioId: _portfolioId, initialSettings, onSaveSuccess }: SettingsFormProps) {
+export function SettingsForm({
+  portfolioId: _portfolioId,
+  initialSettings,
+  slug,
+  slugUpdatedAt,
+  onSaveSuccess,
+  onSlugChangeSuccess,
+}: SettingsFormProps) {
   const [themeColor, setThemeColor] = useState(initialSettings?.themeColor || "#6366f1");
   const [fontFamily, setFontFamily] = useState(initialSettings?.fontFamily || "sans");
   const [seoTitle, setSeoTitle] = useState(initialSettings?.seoTitle || "");
@@ -43,6 +53,133 @@ export function SettingsForm({ portfolioId: _portfolioId, initialSettings, onSav
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
+
+  // Username (slug) management state
+  const [usernameInput, setUsernameInput] = useState(slug);
+  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [usernameSuccess, setUsernameSuccess] = useState<string | null>(null);
+  const [isSavingUsername, setIsSavingUsername] = useState(false);
+  const [usernameGeneralError, setUsernameGeneralError] = useState<string | null>(null);
+  const [usernameGeneralSuccess, setUsernameGeneralSuccess] = useState<boolean>(false);
+
+  // Sync usernameInput state if slug changes externally
+  useEffect(() => {
+    setUsernameInput(slug);
+  }, [slug]);
+
+  // Cooldown calculation: 30 days
+  const getCooldownDaysRemaining = () => {
+    if (!slugUpdatedAt) return 0;
+    const cooldownMs = 30 * 24 * 60 * 60 * 1000;
+    const timeSinceLastUpdate = Date.now() - new Date(slugUpdatedAt).getTime();
+    if (timeSinceLastUpdate < cooldownMs) {
+      return Math.ceil((cooldownMs - timeSinceLastUpdate) / (24 * 60 * 60 * 1000));
+    }
+    return 0;
+  };
+  const cooldownDaysRemaining = getCooldownDaysRemaining();
+
+  // Debounced check for username availability
+  useEffect(() => {
+    if (usernameInput.trim().toLowerCase() === slug) {
+      setUsernameError(null);
+      setUsernameSuccess(null);
+      setIsCheckingUsername(false);
+      return;
+    }
+
+    if (usernameInput.trim().length === 0) {
+      setUsernameError("Username cannot be empty");
+      setUsernameSuccess(null);
+      return;
+    }
+
+    const cleanInput = usernameInput.trim().toLowerCase();
+    const SLUG_REGEX = /^[a-z0-9-]{3,30}$/;
+    if (!SLUG_REGEX.test(cleanInput)) {
+      setUsernameError("Must be 3-30 characters & contain only lowercase letters, numbers, or hyphens");
+      setUsernameSuccess(null);
+      return;
+    }
+
+    setIsCheckingUsername(true);
+    setUsernameError(null);
+    setUsernameSuccess(null);
+
+    const checkAvailability = async () => {
+      try {
+        const res = await fetch(`/api/portfolio/slug-available?slug=${encodeURIComponent(cleanInput)}`);
+        if (!res.ok) {
+          throw new Error("Failed to verify availability");
+        }
+        const data = await res.json();
+        if (data.available) {
+          setUsernameSuccess("Username is available!");
+          setUsernameError(null);
+        } else {
+          setUsernameError(data.reason || "This username is already taken");
+          setUsernameSuccess(null);
+        }
+      } catch (err) {
+        setUsernameError("Error checking availability");
+      } finally {
+        setIsCheckingUsername(false);
+      }
+    };
+
+    const timer = setTimeout(() => {
+      checkAvailability();
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [usernameInput, slug]);
+
+  const handleUsernameSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanInput = usernameInput.trim().toLowerCase();
+    if (cleanInput === slug) return;
+    if (cooldownDaysRemaining > 0) return;
+    if (usernameError) return;
+
+    setIsSavingUsername(true);
+    setUsernameGeneralError(null);
+    setUsernameGeneralSuccess(false);
+
+    try {
+      const res = await fetch("/api/portfolio/slug", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ newSlug: cleanInput }),
+      });
+
+      if (!res.ok) {
+        let errMsg = "Failed to change username";
+        try {
+          const data = await res.json();
+          errMsg = data.error || errMsg;
+        } catch {}
+        throw new Error(errMsg);
+      }
+
+      const updatedPortfolio = await res.json();
+      onSlugChangeSuccess(updatedPortfolio.slug, updatedPortfolio.slugUpdatedAt);
+      setUsernameGeneralSuccess(true);
+      setUsernameSuccess(null);
+
+      // Auto-hide success message after 3 seconds
+      setTimeout(() => {
+        setUsernameGeneralSuccess(false);
+      }, 3000);
+    } catch (err) {
+      console.error(err);
+      setUsernameGeneralError(err instanceof Error ? err.message : "Failed to update username");
+    } finally {
+      setIsSavingUsername(false);
+    }
+  };
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -352,6 +489,105 @@ export function SettingsForm({ portfolioId: _portfolioId, initialSettings, onSav
           </button>
         </div>
       </form>
+
+      {/* Divider */}
+      <div className="border-t border-zinc-800/80 my-8" />
+
+      {/* Change Username Section */}
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-base font-bold text-zinc-200">Change Portfolio URL</h3>
+          <p className="text-[11px] text-zinc-500">
+            Modify the username link (subdomain/path) used to access your public portfolio. 
+            <span className="text-indigo-400 font-medium ml-1">Changes are subject to a 30-day cooldown period.</span>
+          </p>
+        </div>
+
+        {usernameGeneralError && (
+          <div className="bg-red-950/30 border border-red-900/30 text-red-400 px-4 py-3 rounded-xl text-xs flex items-center gap-2 animate-[cardFadeIn_0.3s_ease]">
+            <svg className="w-4 h-4 shrink-0 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span>{usernameGeneralError}</span>
+          </div>
+        )}
+
+        {usernameGeneralSuccess && (
+          <div className="bg-emerald-950/30 border border-emerald-900/30 text-emerald-400 px-4 py-3 rounded-xl text-xs flex items-center gap-2 animate-[cardFadeIn_0.3s_ease]">
+            <svg className="w-4 h-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>Username updated successfully! URL changed.</span>
+          </div>
+        )}
+
+        <form onSubmit={handleUsernameSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <label htmlFor="portfolio-slug" className="text-xs font-semibold text-zinc-400 block">
+              Username URL Path
+            </label>
+            <div className="flex items-center gap-2 bg-zinc-950/40 border border-zinc-800/80 p-1.5 rounded-xl">
+              <span className="text-xs text-zinc-500 pl-2 select-none">buildfolio.app/</span>
+              <input
+                id="portfolio-slug"
+                type="text"
+                value={usernameInput}
+                onChange={(e) => setUsernameInput(e.target.value)}
+                disabled={isSavingUsername || cooldownDaysRemaining > 0}
+                className="flex-1 bg-zinc-900/60 border border-zinc-800/80 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg px-3 py-2 text-xs text-zinc-200 transition outline-none placeholder:text-zinc-600 disabled:opacity-50"
+                placeholder="new-username"
+              />
+            </div>
+            
+            {/* Real-time status / validation feedback */}
+            {isCheckingUsername && (
+              <p className="text-[10px] text-zinc-500 flex items-center gap-1.5 pl-1 animate-pulse">
+                <span className="w-2 h-2 border-2 border-zinc-600 border-t-zinc-400 rounded-full animate-spin"></span>
+                Checking availability...
+              </p>
+            )}
+            {usernameError && (
+              <p className="text-[10px] text-red-400 pl-1">{usernameError}</p>
+            )}
+            {usernameSuccess && (
+              <p className="text-[10px] text-emerald-400 pl-1">{usernameSuccess}</p>
+            )}
+            
+            {cooldownDaysRemaining > 0 ? (
+              <p className="text-[10px] text-amber-500 font-semibold pl-1">
+                ⚠️ You can change your username again in {cooldownDaysRemaining} day(s).
+              </p>
+            ) : (
+              <p className="text-[10px] text-zinc-500">
+                Letters, numbers, and hyphens only (3-30 chars). Custom domains and old links will redirect automatically.
+              </p>
+            )}
+          </div>
+
+          <div className="flex justify-end pt-2">
+            <button
+              type="submit"
+              disabled={
+                isSavingUsername || 
+                cooldownDaysRemaining > 0 || 
+                usernameInput.trim().toLowerCase() === slug || 
+                !!usernameError || 
+                isCheckingUsername
+              }
+              className="bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-850 text-white disabled:text-zinc-500 font-semibold text-xs py-2 px-5 rounded-xl shadow-lg shadow-indigo-600/10 transition duration-150 flex items-center gap-1.5 cursor-pointer"
+            >
+              {isSavingUsername ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <span>Updating Username...</span>
+                </>
+              ) : (
+                "Change Username"
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

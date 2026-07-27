@@ -46,6 +46,7 @@ interface Portfolio {
   createdAt: Date | string;
   sections: Section[];
   settings: Settings | null;
+  slugUpdatedAt?: string | null;
 }
 
 interface Template {
@@ -391,10 +392,19 @@ export function DashboardClient({ initialPortfolio }: DashboardClientProps) {
               <SettingsForm
                 portfolioId={portfolio.id}
                 initialSettings={portfolio.settings}
+                slug={portfolio.slug}
+                slugUpdatedAt={portfolio.slugUpdatedAt}
                 onSaveSuccess={(newSettings) => {
                   setPortfolio((prev) => ({
                     ...prev,
                     settings: newSettings,
+                  }));
+                }}
+                onSlugChangeSuccess={(newSlug, newSlugUpdatedAt) => {
+                  setPortfolio((prev) => ({
+                    ...prev,
+                    slug: newSlug,
+                    slugUpdatedAt: newSlugUpdatedAt,
                   }));
                 }}
               />
