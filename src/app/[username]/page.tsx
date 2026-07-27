@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { SectionRenderer } from "@/components/portfolio/SectionRenderer";
 import { PortfolioHeader } from "@/components/portfolio/sections/PortfolioHeader";
+import { Preloader } from "@/components/portfolio/Preloader";
 import Link from "next/link";
 import type { Metadata } from "next";
 import React from "react";
@@ -43,6 +44,11 @@ export default async function UsernamePage({ params }: PageProps) {
         orderBy: { order: "asc" },
       },
       settings: true,
+      user: {
+        select: {
+          name: true,
+        },
+      },
     },
   });
 
@@ -78,6 +84,12 @@ export default async function UsernamePage({ params }: PageProps) {
       style={customStyles}
       className={`min-h-screen bg-[#09090b] text-[#f4f4f5] antialiased selection:bg-[var(--theme-primary)] selection:text-white ${fontClass}`}
     >
+      <Preloader
+        showPreloader={portfolio.settings?.showPreloader ?? false}
+        logoUrl={portfolio.settings?.logoUrl}
+        userName={portfolio.user?.name}
+        slug={username}
+      />
       <PortfolioHeader username={username} menuLinks={menuLinks} />
 
       <main className="pb-24">

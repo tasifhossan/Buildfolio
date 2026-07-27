@@ -101,6 +101,7 @@ model Settings {
   seoTitle       String?
   seoDescription String?
   logoUrl        String?
+  showPreloader  Boolean   @default(false)
 }
 
 model Template {
