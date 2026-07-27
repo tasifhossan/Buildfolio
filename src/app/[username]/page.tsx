@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { SectionRenderer } from "@/components/portfolio/SectionRenderer";
 import { PortfolioHeader } from "@/components/portfolio/sections/PortfolioHeader";
@@ -53,6 +53,21 @@ export default async function UsernamePage({ params }: PageProps) {
   });
 
   if (!portfolio) {
+    const slugHistoryEntry = await prisma.slugHistory.findUnique({
+      where: { oldSlug: username },
+      include: {
+        portfolio: {
+          select: {
+            slug: true,
+          },
+        },
+      },
+    });
+
+    if (slugHistoryEntry?.portfolio) {
+      redirect(`/${slugHistoryEntry.portfolio.slug}`);
+    }
+
     notFound();
   }
 
