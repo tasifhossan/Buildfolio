@@ -4,6 +4,7 @@ import { HeroSection } from "./sections/HeroSection";
 import { AboutSection } from "./sections/AboutSection";
 import { ProjectsSection } from "./sections/ProjectsSection";
 import { ContactSection } from "./sections/ContactSection";
+import { ExperienceSection } from "./sections/ExperienceSection";
 
 // Zod validation schemas
 export const HeroContentSchema = z.object({
@@ -38,11 +39,38 @@ export const ContactContentSchema = z.object({
   linkedin: z.string().optional(),
 });
 
+export const ExperienceItemSchema = z.object({
+  role: z.string(),
+  company: z.string(),
+  startMonth: z.number().int().min(1).max(12),
+  startYear: z.number().int(),
+  endMonth: z.number().int().min(1).max(12).optional(),
+  endYear: z.number().int().optional(),
+  isCurrent: z.boolean(),
+  description: z.string(),
+}).refine(
+  (data) => {
+    if (data.isCurrent) {
+      return true;
+    }
+    return data.endMonth !== undefined && data.endYear !== undefined;
+  },
+  {
+    message: "End month and year are required if this is not your current role",
+    path: ["endMonth"],
+  }
+);
+
+export const ExperienceContentSchema = z.object({
+  items: z.array(ExperienceItemSchema).optional().default([]),
+});
+
 // Inferred TypeScript types
 export type HeroContent = z.infer<typeof HeroContentSchema>;
 export type AboutContent = z.infer<typeof AboutContentSchema>;
 export type ProjectsContent = z.infer<typeof ProjectsContentSchema>;
 export type ContactContent = z.infer<typeof ContactContentSchema>;
+export type ExperienceContent = z.infer<typeof ExperienceContentSchema>;
 
 export interface Section {
   type: string;
@@ -72,6 +100,10 @@ export function SectionRenderer({ section }: SectionRendererProps) {
       case "contact": {
         const validatedContent = ContactContentSchema.parse(section.content || {});
         return <ContactSection content={validatedContent} />;
+      }
+      case "experience": {
+        const validatedContent = ExperienceContentSchema.parse(section.content || {});
+        return <ExperienceSection content={validatedContent} />;
       }
       default:
         // If the type doesn't match any known component, render nothing and log a warning
