@@ -71,7 +71,7 @@ export function ExperienceForm({ value, onChange, onSave, isSaving = false }: Ex
     });
   };
 
-  const handleItemChange = (index: number, field: keyof ExperienceItem, val: any) => {
+  const handleItemChange = (index: number, field: keyof ExperienceItem, val: string | number | boolean) => {
     const updated = items.map((item, idx) => {
       if (idx === index) {
         const updatedItem = { ...item, [field]: val };
