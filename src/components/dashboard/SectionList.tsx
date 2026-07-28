@@ -5,7 +5,8 @@ import { HeroForm } from "./forms/HeroForm";
 import { AboutForm } from "./forms/AboutForm";
 import { ContactForm } from "./forms/ContactForm";
 import { ProjectsForm } from "./forms/ProjectsForm";
-import { SectionRenderer, HeroContent, AboutContent, ContactContent, ProjectsContent } from "../portfolio/SectionRenderer";
+import { ExperienceForm } from "./forms/ExperienceForm";
+import { SectionRenderer, HeroContent, AboutContent, ContactContent, ProjectsContent, ExperienceContent } from "../portfolio/SectionRenderer";
 import {
   DndContext,
   closestCenter,
@@ -108,6 +109,7 @@ function SortableItem({ section, onToggleVisibility, onDeleteClick, onEditClick 
             {section.type === "About" && (section.content?.bio || "Biography details")}
             {section.type === "Projects" && (section.content?.title || "Projects gallery")}
             {section.type === "Contact" && (section.content?.title || "Contact connections")}
+            {section.type.toLowerCase() === "experience" && "Work experience timeline"}
           </p>
         </div>
       </div>
@@ -460,7 +462,7 @@ export function SectionList() {
                 }}
               />
               <div className="absolute right-0 mt-2 w-40 rounded-xl bg-zinc-900 border border-zinc-800 shadow-xl py-1.5 z-20 animate-[cardFadeIn_0.15s_cubic-bezier(0.16,1,0.3,1)]">
-                {["Hero", "About", "Projects", "Contact"].map((type) => (
+                {["Hero", "About", "Projects", "Contact", "Experience"].map((type) => (
                   <button
                     key={type}
                     disabled={creatingType !== null}
@@ -627,6 +629,13 @@ export function SectionList() {
                   ) : editingSection.type === "Projects" ? (
                     <ProjectsForm
                       value={draftContent as ProjectsContent}
+                      onChange={setDraftContent}
+                      isSaving={isSavingSection}
+                      onSave={handleSaveSectionContent}
+                    />
+                  ) : editingSection.type.toLowerCase() === "experience" ? (
+                    <ExperienceForm
+                      value={draftContent as ExperienceContent}
                       onChange={setDraftContent}
                       isSaving={isSavingSection}
                       onSave={handleSaveSectionContent}
