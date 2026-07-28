@@ -23,11 +23,11 @@ export async function POST(req: Request) {
       );
     }
 
-    // Validate size (under 5MB)
-    const maxFileSize = 5 * 1024 * 1024;
+    // Validate size (under 2MB)
+    const maxFileSize = 2 * 1024 * 1024;
     if (file.size > maxFileSize) {
       return NextResponse.json(
-        { error: "File size exceeds 5MB limit" },
+        { error: "File size exceeds 2MB limit" },
         { status: 400 }
       );
     }

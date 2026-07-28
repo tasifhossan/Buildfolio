@@ -29,9 +29,9 @@ export function TestimonialsForm({ value, onChange, onSave, isSaving = false }: 
     if (!file) return;
 
     // Client-side validations
-    const maxFileSize = 5 * 1024 * 1024;
+    const maxFileSize = 2 * 1024 * 1024;
     if (file.size > maxFileSize) {
-      alert("File size exceeds 5MB limit");
+      alert("File size exceeds 2MB limit");
       return;
     }
 
