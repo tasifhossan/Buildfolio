@@ -36,6 +36,32 @@ const ContactContentSchema = z.object({
   linkedin: z.string().optional(),
 });
 
+const ExperienceItemSchema = z.object({
+  role: z.string().min(1, "Role is required"),
+  company: z.string().min(1, "Company is required"),
+  startMonth: z.number().int().min(1, "Start month must be between 1 and 12").max(12, "Start month must be between 1 and 12"),
+  startYear: z.number().int(),
+  endMonth: z.number().int().min(1, "End month must be between 1 and 12").max(12, "End month must be between 1 and 12").optional(),
+  endYear: z.number().int().optional(),
+  isCurrent: z.boolean(),
+  description: z.string(),
+}).refine(
+  (data) => {
+    if (data.isCurrent) {
+      return true;
+    }
+    return data.endMonth !== undefined && data.endYear !== undefined;
+  },
+  {
+    message: "End month and year are required if this is not your current role",
+    path: ["endMonth"],
+  }
+);
+
+const ExperienceContentSchema = z.object({
+  items: z.array(ExperienceItemSchema).optional(),
+});
+
 interface RouteParams {
   params: Promise<{ sectionId: string }>;
 }
@@ -115,6 +141,8 @@ export async function PATCH(req: Request, { params }: RouteParams) {
       parseResult = ProjectsContentSchema.safeParse(content);
     } else if (type === "contact") {
       parseResult = ContactContentSchema.safeParse(content);
+    } else if (type === "experience") {
+      parseResult = ExperienceContentSchema.safeParse(content);
     } else {
       return NextResponse.json({ error: "Unknown section type" }, { status: 400 });
     }

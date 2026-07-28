@@ -6,9 +6,9 @@ import { revalidatePath } from "next/cache";
 
 const createSectionSchema = z.object({
   type: z.string().min(1, "Type is required").refine(
-    (val) => ["hero", "about", "projects", "contact"].includes(val.toLowerCase()),
+    (val) => ["hero", "about", "projects", "contact", "experience"].includes(val.toLowerCase()),
     {
-      message: "Type must be one of: hero, about, projects, contact",
+      message: "Type must be one of: hero, about, projects, contact, experience",
     }
   ),
 });
@@ -34,6 +34,9 @@ const DEFAULT_CONTENTS: Record<string, Record<string, JsonValue>> = {
     email: "",
     github: "",
     linkedin: "",
+  },
+  experience: {
+    items: [],
   },
 };
 
