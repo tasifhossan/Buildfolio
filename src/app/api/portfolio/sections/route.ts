@@ -36,7 +36,16 @@ const DEFAULT_CONTENTS: Record<string, Record<string, JsonValue>> = {
     linkedin: "",
   },
   experience: {
-    items: [],
+    items: [
+      {
+        role: "Software Engineer",
+        company: "Example Corp",
+        startMonth: 1,
+        startYear: 2024,
+        isCurrent: true,
+        description: "Building amazing things and solving challenging problems.",
+      },
+    ],
   },
 };
 

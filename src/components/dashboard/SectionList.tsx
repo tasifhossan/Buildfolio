@@ -207,7 +207,7 @@ export function SectionList() {
       );
       setEditingSection(null);
     } catch (err) {
-      console.error("Failed to save section content:", err);
+      console.warn("Failed to save section content:", err);
       setEditError(err instanceof Error ? err.message : "Failed to save section content");
     } finally {
       setIsSavingSection(false);
