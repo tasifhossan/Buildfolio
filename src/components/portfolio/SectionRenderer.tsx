@@ -5,6 +5,7 @@ import { AboutSection } from "./sections/AboutSection";
 import { ProjectsSection } from "./sections/ProjectsSection";
 import { ContactSection } from "./sections/ContactSection";
 import { ExperienceSection } from "./sections/ExperienceSection";
+import { TestimonialsSection } from "./sections/TestimonialsSection";
 
 // Zod validation schemas
 export const HeroContentSchema = z.object({
@@ -65,12 +66,24 @@ export const ExperienceContentSchema = z.object({
   items: z.array(ExperienceItemSchema).optional().default([]),
 });
 
+export const TestimonialItemSchema = z.object({
+  name: z.string(),
+  role: z.string().optional(),
+  quote: z.string(),
+  photoUrl: z.string().optional(),
+});
+
+export const TestimonialsContentSchema = z.object({
+  items: z.array(TestimonialItemSchema).optional().default([]),
+});
+
 // Inferred TypeScript types
 export type HeroContent = z.infer<typeof HeroContentSchema>;
 export type AboutContent = z.infer<typeof AboutContentSchema>;
 export type ProjectsContent = z.infer<typeof ProjectsContentSchema>;
 export type ContactContent = z.infer<typeof ContactContentSchema>;
 export type ExperienceContent = z.infer<typeof ExperienceContentSchema>;
+export type TestimonialsContent = z.infer<typeof TestimonialsContentSchema>;
 
 export interface Section {
   type: string;
@@ -104,6 +117,10 @@ export function SectionRenderer({ section }: SectionRendererProps) {
       case "experience": {
         const validatedContent = ExperienceContentSchema.parse(section.content || {});
         return <ExperienceSection content={validatedContent} />;
+      }
+      case "testimonials": {
+        const validatedContent = TestimonialsContentSchema.parse(section.content || {});
+        return <TestimonialsSection content={validatedContent} />;
       }
       default:
         // If the type doesn't match any known component, render nothing and log a warning

@@ -62,6 +62,17 @@ const ExperienceContentSchema = z.object({
   items: z.array(ExperienceItemSchema).optional(),
 });
 
+const TestimonialItemSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  role: z.string().optional(),
+  quote: z.string().min(1, "Quote is required"),
+  photoUrl: z.string().optional(),
+});
+
+const TestimonialsContentSchema = z.object({
+  items: z.array(TestimonialItemSchema).optional(),
+});
+
 interface RouteParams {
   params: Promise<{ sectionId: string }>;
 }
@@ -143,6 +154,8 @@ export async function PATCH(req: Request, { params }: RouteParams) {
       parseResult = ContactContentSchema.safeParse(content);
     } else if (type === "experience") {
       parseResult = ExperienceContentSchema.safeParse(content);
+    } else if (type === "testimonials") {
+      parseResult = TestimonialsContentSchema.safeParse(content);
     } else {
       return NextResponse.json({ error: "Unknown section type" }, { status: 400 });
     }
