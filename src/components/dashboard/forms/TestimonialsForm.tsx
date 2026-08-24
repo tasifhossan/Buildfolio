@@ -2,39 +2,26 @@
 
 import { useState } from "react";
 
-export interface ProjectItem {
+export interface TestimonialItem {
   name?: string;
-  title?: string;
-  description?: string;
-  link?: string;
-  imageUrl?: string;
+  role?: string;
+  quote?: string;
+  photoUrl?: string;
 }
 
-export interface ProjectsContent {
-  title?: string;
-  list?: ProjectItem[];
-  items?: ProjectItem[];
+export interface TestimonialsContent {
+  items?: TestimonialItem[];
 }
 
-export interface Section {
-  id: string;
-  portfolioId: string;
-  type: string;
-  order: number;
-  isVisible: boolean;
-  content: ProjectsContent;
-}
-
-interface ProjectsFormProps {
-  value: ProjectsContent;
-  onChange: (updatedContent: ProjectsContent) => void;
-  onSave: (updatedContent: ProjectsContent) => void | Promise<void>;
+interface TestimonialsFormProps {
+  value: TestimonialsContent;
+  onChange: (updatedContent: TestimonialsContent) => void;
+  onSave: (updatedContent: TestimonialsContent) => void | Promise<void>;
   isSaving?: boolean;
 }
 
-export function ProjectsForm({ value, onChange, onSave, isSaving = false }: ProjectsFormProps) {
-  const title = value.title ?? "Projects";
-  const list = value.list || value.items || [];
+export function TestimonialsForm({ value, onChange, onSave, isSaving = false }: TestimonialsFormProps) {
+  const items = value.items || [];
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
 
   const handleImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,7 +57,7 @@ export function ProjectsForm({ value, onChange, onSave, isSaving = false }: Proj
       }
 
       const data = await res.json();
-      handleItemChange(index, "imageUrl", data.secure_url);
+      handleItemChange(index, "photoUrl", data.secure_url);
     } catch (err) {
       console.error("Upload error:", err);
       alert(err instanceof Error ? err.message : "Failed to upload image");
@@ -81,45 +68,31 @@ export function ProjectsForm({ value, onChange, onSave, isSaving = false }: Proj
   };
 
   const handleAddItem = () => {
-    const updated = [...list, { name: "", title: "", description: "", link: "" }];
+    const updated = [...items, { name: "", role: "", quote: "", photoUrl: "" }];
     onChange({
       ...value,
-      list: updated,
       items: updated,
     });
   };
 
   const handleRemoveItem = (indexToRemove: number) => {
-    const updated = list.filter((_, idx) => idx !== indexToRemove);
+    const updated = items.filter((_, idx) => idx !== indexToRemove);
     onChange({
       ...value,
-      list: updated,
       items: updated,
     });
   };
 
-  const handleItemChange = (index: number, field: keyof ProjectItem, val: string) => {
-    const updated = list.map((item, idx) => {
+  const handleItemChange = (index: number, field: keyof TestimonialItem, val: string) => {
+    const updated = items.map((item, idx) => {
       if (idx === index) {
-        const updatedItem = { ...item, [field]: val };
-        // Keep both name and title in sync for maximum safety
-        if (field === "name") updatedItem.title = val;
-        if (field === "title") updatedItem.name = val;
-        return updatedItem;
+        return { ...item, [field]: val };
       }
       return item;
     });
     onChange({
       ...value,
-      list: updated,
       items: updated,
-    });
-  };
-
-  const handleTitleChange = (val: string) => {
-    onChange({
-      ...value,
-      title: val,
     });
   };
 
@@ -130,26 +103,10 @@ export function ProjectsForm({ value, onChange, onSave, isSaving = false }: Proj
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-h-[60vh] overflow-y-auto pr-1 animate-[cardFadeIn_0.3s_cubic-bezier(0.16,1,0.3,1)]">
-      {/* Section Title Input */}
-      <div className="space-y-1.5">
-        <label htmlFor="projects-title" className="text-xs font-semibold text-zinc-400">
-          Section Title
-        </label>
-        <input
-          id="projects-title"
-          type="text"
-          value={title}
-          onChange={(e) => handleTitleChange(e.target.value)}
-          disabled={isSaving}
-          className="w-full bg-zinc-950/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-xs text-zinc-100 transition duration-150 outline-none placeholder:text-zinc-600 disabled:opacity-50"
-          placeholder="Projects"
-        />
-      </div>
-
-      {/* Projects List Section */}
+      {/* Testimonials List Section */}
       <div className="space-y-4">
         <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2">
-          <h4 className="text-xs font-bold text-zinc-300 uppercase tracking-wider">Project Items</h4>
+          <h4 className="text-xs font-bold text-zinc-300 uppercase tracking-wider">Testimonial Items</h4>
           <button
             type="button"
             onClick={handleAddItem}
@@ -159,17 +116,17 @@ export function ProjectsForm({ value, onChange, onSave, isSaving = false }: Proj
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
             </svg>
-            Add Project
+            Add Testimonial
           </button>
         </div>
 
-        {list.length === 0 ? (
+        {items.length === 0 ? (
           <div className="text-center py-8 bg-zinc-950/20 border border-dashed border-zinc-800/50 rounded-xl">
-            <p className="text-xs text-zinc-500 italic">No projects listed yet. Click &apos;Add Project&apos; to begin.</p>
+            <p className="text-xs text-zinc-500 italic">No testimonials listed yet. Click &apos;Add Testimonial&apos; to begin.</p>
           </div>
         ) : (
           <div className="space-y-4">
-            {list.map((item, index) => {
+            {items.map((item, index) => {
               return (
                 <div
                   key={index}
@@ -178,14 +135,14 @@ export function ProjectsForm({ value, onChange, onSave, isSaving = false }: Proj
                   {/* Card Header with delete */}
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-bold text-indigo-400 bg-indigo-950/20 px-2 py-0.5 rounded-md border border-indigo-900/30">
-                      Project #{index + 1}
+                      Testimonial #{index + 1}
                     </span>
                     <button
                       type="button"
                       onClick={() => handleRemoveItem(index)}
                       disabled={isSaving}
                       className="text-zinc-500 hover:text-red-400 transition duration-150 cursor-pointer disabled:opacity-50 p-1 rounded-lg hover:bg-red-950/20"
-                      aria-label="Remove Project"
+                      aria-label="Remove Testimonial"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -196,62 +153,62 @@ export function ProjectsForm({ value, onChange, onSave, isSaving = false }: Proj
                   {/* Input fields */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div className="space-y-1">
-                      <label className="text-[10px] font-semibold text-zinc-500">Project Title</label>
+                      <label className="text-[10px] font-semibold text-zinc-500">Name</label>
                       <input
                         type="text"
-                        value={item.name || item.title || ""}
+                        value={item.name || ""}
                         onChange={(e) => handleItemChange(index, "name", e.target.value)}
                         disabled={isSaving}
                         className="w-full bg-zinc-900/60 border border-zinc-800/80 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg px-3 py-2 text-xs text-zinc-200 transition outline-none placeholder:text-zinc-600 disabled:opacity-50"
-                        placeholder="e.g. Portfolio Builder"
+                        placeholder="e.g. Jane Doe"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[10px] font-semibold text-zinc-500">Project Link (Optional)</label>
+                      <label className="text-[10px] font-semibold text-zinc-500">Role / Company (Optional)</label>
                       <input
                         type="text"
-                        value={item.link || ""}
-                        onChange={(e) => handleItemChange(index, "link", e.target.value)}
+                        value={item.role || ""}
+                        onChange={(e) => handleItemChange(index, "role", e.target.value)}
                         disabled={isSaving}
                         className="w-full bg-zinc-900/60 border border-zinc-800/80 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg px-3 py-2 text-xs text-zinc-200 transition outline-none placeholder:text-zinc-600 disabled:opacity-50"
-                        placeholder="https://github.com/..."
+                        placeholder="e.g. CTO at Acme Corp"
                       />
                     </div>
                   </div>
 
-                  {/* Image URL and Upload Field */}
+                  {/* Photo URL and Upload Field */}
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-semibold text-zinc-500">Project Image</label>
+                    <label className="text-[10px] font-semibold text-zinc-500">Photo</label>
                     <div className="flex items-center gap-3">
-                      {item.imageUrl ? (
-                        <div className="relative w-16 h-12 rounded-lg overflow-hidden border border-zinc-800 bg-zinc-950 shrink-0">
+                      {item.photoUrl ? (
+                        <div className="relative w-12 h-12 rounded-full overflow-hidden border border-zinc-800 bg-zinc-950 shrink-0">
                           <img
-                            src={item.imageUrl}
-                            alt="Project Preview"
+                            src={item.photoUrl}
+                            alt="Photo Preview"
                             className="w-full h-full object-cover"
                           />
                           <button
                             type="button"
-                            onClick={() => handleItemChange(index, "imageUrl", "")}
-                            className="absolute inset-0 bg-black/60 opacity-0 hover:opacity-100 transition flex items-center justify-center text-red-400 font-bold text-[10px] cursor-pointer"
+                            onClick={() => handleItemChange(index, "photoUrl", "")}
+                            className="absolute inset-0 bg-black/60 opacity-0 hover:opacity-100 transition flex items-center justify-center text-red-400 font-bold text-[9px] cursor-pointer"
                           >
                             Remove
                           </button>
                         </div>
                       ) : (
-                        <div className="w-16 h-12 rounded-lg border border-dashed border-zinc-800 flex items-center justify-center text-zinc-600 text-[10px] bg-zinc-950/20 shrink-0 select-none">
-                          No Image
+                        <div className="w-12 h-12 rounded-full border border-dashed border-zinc-800 flex items-center justify-center text-zinc-600 text-[9px] bg-zinc-950/20 shrink-0 select-none">
+                          No Photo
                         </div>
                       )}
                       
                       <div className="flex-1 flex gap-2">
                         <input
                           type="text"
-                          value={item.imageUrl || ""}
-                          onChange={(e) => handleItemChange(index, "imageUrl", e.target.value)}
+                          value={item.photoUrl || ""}
+                          onChange={(e) => handleItemChange(index, "photoUrl", e.target.value)}
                           disabled={isSaving || uploadingIndex === index}
                           className="flex-1 bg-zinc-900/60 border border-zinc-800/80 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg px-3 py-2 text-xs text-zinc-200 transition outline-none placeholder:text-zinc-600 disabled:opacity-50"
-                          placeholder="Image URL or upload..."
+                          placeholder="Photo URL or upload..."
                         />
                         <label className="relative shrink-0">
                           <input
@@ -277,14 +234,14 @@ export function ProjectsForm({ value, onChange, onSave, isSaving = false }: Proj
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[10px] font-semibold text-zinc-500">Description</label>
+                    <label className="text-[10px] font-semibold text-zinc-500">Quote</label>
                     <textarea
-                      value={item.description || ""}
-                      onChange={(e) => handleItemChange(index, "description", e.target.value)}
+                      value={item.quote || ""}
+                      onChange={(e) => handleItemChange(index, "quote", e.target.value)}
                       disabled={isSaving}
-                      rows={2}
+                      rows={3}
                       className="w-full bg-zinc-900/60 border border-zinc-800/80 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg px-3 py-2 text-xs text-zinc-200 transition outline-none placeholder:text-zinc-600 disabled:opacity-50 resize-none"
-                      placeholder="Brief summary of what the project is or does..."
+                      placeholder="What did they say about you and your work?"
                     />
                   </div>
                 </div>
@@ -315,4 +272,4 @@ export function ProjectsForm({ value, onChange, onSave, isSaving = false }: Proj
   );
 }
 
-export default ProjectsForm;
+export default TestimonialsForm;

@@ -185,9 +185,9 @@ export function SettingsForm({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const maxFileSize = 5 * 1024 * 1024;
+    const maxFileSize = 2 * 1024 * 1024;
     if (file.size > maxFileSize) {
-      setError("Logo file size exceeds 5MB limit");
+      setError("Logo file size exceeds 2MB limit");
       return;
     }
 
