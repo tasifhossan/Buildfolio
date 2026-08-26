@@ -102,7 +102,8 @@ export function TestimonialsForm({ value, onChange, onSave, isSaving = false }: 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-h-[60vh] overflow-y-auto pr-1 animate-[cardFadeIn_0.3s_cubic-bezier(0.16,1,0.3,1)]">
+    <form onSubmit={handleSubmit} className="flex flex-col h-full min-h-0 space-y-4 animate-[cardFadeIn_0.3s_cubic-bezier(0.16,1,0.3,1)]">
+      <div className="flex-1 overflow-y-auto pr-2 space-y-6">
       {/* Testimonials List Section */}
       <div className="space-y-4">
         <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2">
@@ -256,9 +257,10 @@ export function TestimonialsForm({ value, onChange, onSave, isSaving = false }: 
           </div>
         )}
       </div>
+      </div>
 
       {/* Save Button Row */}
-      <div className="flex justify-end pt-2 border-t border-zinc-800/80">
+      <div className="flex justify-end pt-3 border-t border-zinc-850 shrink-0">
         <button
           type="submit"
           disabled={isSaving}

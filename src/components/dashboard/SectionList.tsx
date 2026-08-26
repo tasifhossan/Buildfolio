@@ -606,7 +606,7 @@ export function SectionList() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch min-h-0 flex-1 overflow-hidden">
               {/* Left Pane - Form */}
               <div className="flex flex-col min-h-0 h-full overflow-hidden">
-                <div className="flex-1 overflow-y-auto pr-3 space-y-4">
+                <div className="flex-1 min-h-0 h-full">
                   {editingSection.type === "Hero" ? (
                     <HeroForm
                       value={draftContent as HeroContent}

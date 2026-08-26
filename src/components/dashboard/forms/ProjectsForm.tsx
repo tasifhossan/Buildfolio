@@ -129,7 +129,8 @@ export function ProjectsForm({ value, onChange, onSave, isSaving = false }: Proj
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-h-[60vh] overflow-y-auto pr-1 animate-[cardFadeIn_0.3s_cubic-bezier(0.16,1,0.3,1)]">
+    <form onSubmit={handleSubmit} className="flex flex-col h-full min-h-0 space-y-4 animate-[cardFadeIn_0.3s_cubic-bezier(0.16,1,0.3,1)]">
+      <div className="flex-1 overflow-y-auto pr-2 space-y-6">
       {/* Section Title Input */}
       <div className="space-y-1.5">
         <label htmlFor="projects-title" className="text-xs font-semibold text-zinc-400">
@@ -299,9 +300,10 @@ export function ProjectsForm({ value, onChange, onSave, isSaving = false }: Proj
           </div>
         )}
       </div>
+      </div>
 
       {/* Save Button Row */}
-      <div className="flex justify-end pt-2 border-t border-zinc-800/80">
+      <div className="flex justify-end pt-3 border-t border-zinc-850 shrink-0">
         <button
           type="submit"
           disabled={isSaving}
