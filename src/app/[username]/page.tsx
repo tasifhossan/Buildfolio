@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { SectionRenderer } from "@/components/portfolio/SectionRenderer";
 import { PortfolioHeader } from "@/components/portfolio/sections/PortfolioHeader";
 import { Preloader } from "@/components/portfolio/Preloader";
+import { AnalyticsTracker } from "@/components/portfolio/AnalyticsTracker";
 import Link from "next/link";
 import type { Metadata } from "next";
 import React from "react";
@@ -99,6 +100,7 @@ export default async function UsernamePage({ params }: PageProps) {
       style={customStyles}
       className={`min-h-screen bg-[#09090b] text-[#f4f4f5] antialiased selection:bg-[var(--theme-primary)] selection:text-white ${fontClass}`}
     >
+      <AnalyticsTracker portfolioId={portfolio.id} />
       <Preloader
         showPreloader={portfolio.settings?.showPreloader ?? false}
         logoUrl={portfolio.settings?.logoUrl}

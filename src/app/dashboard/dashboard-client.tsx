@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { getPortfolioUrl } from "@/lib/get-portfolio-url";
 import { SectionList } from "@/components/dashboard/SectionList";
 import { SettingsForm, Settings } from "@/components/dashboard/SettingsForm";
+import { AnalyticsDashboard } from "@/components/dashboard/AnalyticsDashboard";
 
 interface HeroContent {
   title?: string;
@@ -65,7 +66,7 @@ interface DashboardClientProps {
 export function DashboardClient({ initialPortfolio }: DashboardClientProps) {
   const router = useRouter();
   const [portfolio, setPortfolio] = useState<Portfolio>(initialPortfolio);
-  const [activeTab, setActiveTab] = useState<"sections" | "settings">("sections");
+  const [activeTab, setActiveTab] = useState<"sections" | "settings" | "analytics">("sections");
   const [showTemplateSelector, setShowTemplateSelector] = useState(
     portfolio.sections.length === 0
   );
@@ -375,6 +376,16 @@ export function DashboardClient({ initialPortfolio }: DashboardClientProps) {
                 Sections
               </button>
               <button
+                onClick={() => setActiveTab("analytics")}
+                className={`py-2.5 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition duration-150 cursor-pointer ${
+                  activeTab === "analytics"
+                    ? "border-indigo-500 text-indigo-400"
+                    : "border-transparent text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                Analytics
+              </button>
+              <button
                 onClick={() => setActiveTab("settings")}
                 className={`py-2.5 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition duration-150 cursor-pointer ${
                   activeTab === "settings"
@@ -388,6 +399,8 @@ export function DashboardClient({ initialPortfolio }: DashboardClientProps) {
 
             {activeTab === "sections" ? (
               <SectionList key={refreshKey} />
+            ) : activeTab === "analytics" ? (
+              <AnalyticsDashboard portfolioId={portfolio.id} />
             ) : (
               <SettingsForm
                 portfolioId={portfolio.id}
