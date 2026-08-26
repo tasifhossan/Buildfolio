@@ -124,7 +124,7 @@ export default async function UsernamePage({ params }: PageProps) {
         userName={portfolio.user?.name}
         slug={username}
       />
-      <PortfolioHeader username={username} menuLinks={menuLinks} />
+      <PortfolioHeader username={username} menuLinks={menuLinks} resumeUrl={portfolio.settings?.resumeUrl} />
 
       <main className="pb-24">
         {sanitizedSections.length === 0 ? (

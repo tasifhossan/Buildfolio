@@ -22,6 +22,7 @@ const settingsSchema = z.object({
     .regex(/^G-[A-Z0-9]+$/, "Must be a valid GA4 Measurement ID (e.g. G-XXXXXXXXXX)")
     .optional()
     .or(z.literal("")),
+  resumeUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
 });
 
 export async function PATCH(req: Request) {
@@ -53,7 +54,7 @@ export async function PATCH(req: Request) {
       );
     }
 
-    const { themeColor, fontFamily, seoTitle, seoDescription, logoUrl, googleAnalyticsId } = parseResult.data;
+    const { themeColor, fontFamily, seoTitle, seoDescription, logoUrl, googleAnalyticsId, resumeUrl } = parseResult.data;
 
     // Fetch user's portfolio to check ownership and get the slug
     const portfolio = await prisma.portfolio.findFirst({
@@ -77,6 +78,7 @@ export async function PATCH(req: Request) {
         seoDescription: seoDescription || null,
         logoUrl: logoUrl || null,
         googleAnalyticsId: googleAnalyticsId || null,
+        resumeUrl: resumeUrl || null,
       },
       create: {
         portfolioId: portfolio.id,
@@ -86,6 +88,7 @@ export async function PATCH(req: Request) {
         seoDescription: seoDescription || null,
         logoUrl: logoUrl || null,
         googleAnalyticsId: googleAnalyticsId || null,
+        resumeUrl: resumeUrl || null,
       },
     });
 
