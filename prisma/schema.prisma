@@ -117,6 +117,7 @@ model Settings {
   logoUrl           String?
   showPreloader     Boolean   @default(false)
   googleAnalyticsId String?   // User's own GA4 Measurement ID (e.g. G-XXXXXXXXXX)
+  resumeUrl         String?   // Cloudinary URL for the user's resume PDF
 }
 
 model Template {

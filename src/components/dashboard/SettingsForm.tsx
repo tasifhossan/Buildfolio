@@ -11,6 +11,7 @@ export interface Settings {
   seoDescription: string | null;
   logoUrl?: string | null;
   googleAnalyticsId?: string | null;
+  resumeUrl?: string | null;
 }
 
 interface SettingsFormProps {
@@ -51,6 +52,8 @@ export function SettingsForm({
   const [seoDescription, setSeoDescription] = useState(initialSettings?.seoDescription || "");
   const [logoUrl, setLogoUrl] = useState(initialSettings?.logoUrl || "");
   const [googleAnalyticsId, setGoogleAnalyticsId] = useState(initialSettings?.googleAnalyticsId || "");
+  const [resumeUrl, setResumeUrl] = useState(initialSettings?.resumeUrl || "");
+  const [isUploadingResume, setIsUploadingResume] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -245,6 +248,7 @@ export function SettingsForm({
           seoDescription,
           logoUrl: logoUrl || "",
           googleAnalyticsId: googleAnalyticsId || "",
+          resumeUrl: resumeUrl || "",
         }),
       });
 
@@ -494,6 +498,113 @@ export function SettingsForm({
               Google Analytics 4
             </a>{" "}
             Measurement ID to track your portfolio visitors in your own GA dashboard.
+          </p>
+        </div>
+
+        {/* Resume PDF Upload */}
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-zinc-400">Resume / CV (PDF)</label>
+
+          {resumeUrl ? (
+            <div className="flex items-center gap-3 bg-zinc-950/60 border border-zinc-800 rounded-xl px-4 py-3">
+              {/* PDF icon */}
+              <div className="shrink-0 w-8 h-8 rounded-lg bg-red-950/40 border border-red-900/30 flex items-center justify-center">
+                <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-zinc-200 truncate">resume.pdf</p>
+                <a
+                  href={resumeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] text-indigo-400 hover:underline"
+                >
+                  Preview ↗
+                </a>
+              </div>
+              <button
+                type="button"
+                onClick={() => setResumeUrl("")}
+                disabled={isSaving}
+                className="shrink-0 text-zinc-500 hover:text-red-400 transition-colors duration-150 cursor-pointer"
+                title="Remove resume"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          ) : (
+            <label
+              htmlFor="resume-upload"
+              className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed border-zinc-800 hover:border-indigo-500/50 rounded-xl px-4 py-6 cursor-pointer transition-colors duration-200 group ${
+                isUploadingResume ? "opacity-50 pointer-events-none" : ""
+              }`}
+            >
+              {isUploadingResume ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-indigo-500/30 border-t-indigo-400 rounded-full animate-spin" />
+                  <span className="text-xs text-zinc-400">Uploading resume...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-8 h-8 text-zinc-600 group-hover:text-indigo-400 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                  <div className="text-center">
+                    <p className="text-xs font-medium text-zinc-400 group-hover:text-zinc-200 transition-colors">
+                      Click to upload PDF
+                    </p>
+                    <p className="text-[10px] text-zinc-600 mt-0.5">PDF only · max 5MB</p>
+                  </div>
+                </>
+              )}
+              <input
+                id="resume-upload"
+                type="file"
+                accept="application/pdf"
+                className="sr-only"
+                disabled={isUploadingResume || isSaving}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  if (file.type !== "application/pdf") {
+                    setError("Only PDF files are allowed for resumes");
+                    return;
+                  }
+                  if (file.size > 5 * 1024 * 1024) {
+                    setError("Resume file size exceeds 5MB limit");
+                    return;
+                  }
+                  setIsUploadingResume(true);
+                  setError(null);
+                  try {
+                    const formData = new FormData();
+                    formData.append("file", file);
+                    const res = await fetch("/api/upload/resume", {
+                      method: "POST",
+                      body: formData,
+                    });
+                    if (!res.ok) {
+                      const data = await res.json();
+                      throw new Error(data.error || "Failed to upload resume");
+                    }
+                    const data = await res.json();
+                    setResumeUrl(data.secure_url);
+                  } catch (err) {
+                    setError(err instanceof Error ? err.message : "Failed to upload resume");
+                  } finally {
+                    setIsUploadingResume(false);
+                    e.target.value = "";
+                  }
+                }}
+              />
+            </label>
+          )}
+          <p className="text-[10px] text-zinc-500">
+            Visitors will see a <span className="text-zinc-300 font-medium">Download Resume</span> button in the header of your portfolio.
           </p>
         </div>
 
