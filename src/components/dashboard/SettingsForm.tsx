@@ -10,6 +10,7 @@ export interface Settings {
   seoTitle: string | null;
   seoDescription: string | null;
   logoUrl?: string | null;
+  googleAnalyticsId?: string | null;
 }
 
 interface SettingsFormProps {
@@ -49,6 +50,7 @@ export function SettingsForm({
   const [seoTitle, setSeoTitle] = useState(initialSettings?.seoTitle || "");
   const [seoDescription, setSeoDescription] = useState(initialSettings?.seoDescription || "");
   const [logoUrl, setLogoUrl] = useState(initialSettings?.logoUrl || "");
+  const [googleAnalyticsId, setGoogleAnalyticsId] = useState(initialSettings?.googleAnalyticsId || "");
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -242,6 +244,7 @@ export function SettingsForm({
           seoTitle,
           seoDescription,
           logoUrl: logoUrl || "",
+          googleAnalyticsId: googleAnalyticsId || "",
         }),
       });
 
@@ -469,6 +472,29 @@ export function SettingsForm({
             placeholder="e.g. Welcome to my personal portfolio website. Explore my recent engineering projects, core technical skills, and details on how to get in touch."
           />
           <p className="text-[10px] text-zinc-500">Summary description snippet shown by search engines (recommended under 160 characters).</p>
+        </div>
+
+        {/* Google Analytics ID */}
+        <div className="space-y-1.5">
+          <label htmlFor="ga-measurement-id" className="text-xs font-semibold text-zinc-400">
+            Google Analytics Measurement ID
+          </label>
+          <input
+            id="ga-measurement-id"
+            type="text"
+            value={googleAnalyticsId}
+            onChange={(e) => setGoogleAnalyticsId(e.target.value.trim().toUpperCase())}
+            disabled={isSaving}
+            placeholder="G-XXXXXXXXXX"
+            className="w-full bg-zinc-950/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-xs text-zinc-100 font-mono transition duration-150 outline-none placeholder:text-zinc-600 disabled:opacity-50"
+          />
+          <p className="text-[10px] text-zinc-500">
+            Add your own{" "}
+            <a href="https://analytics.google.com" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:underline">
+              Google Analytics 4
+            </a>{" "}
+            Measurement ID to track your portfolio visitors in your own GA dashboard.
+          </p>
         </div>
 
         {/* Action Button */}
