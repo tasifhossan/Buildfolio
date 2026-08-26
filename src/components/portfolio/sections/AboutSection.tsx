@@ -1,5 +1,6 @@
 import React from "react";
 import type { AboutContent } from "../SectionRenderer";
+import { MarkdownRenderer } from "../MarkdownRenderer";
 
 interface AboutSectionProps {
   content: AboutContent;
@@ -19,9 +20,10 @@ export function AboutSection({ content }: AboutSectionProps) {
           </h2>
         </div>
         <div className="md:col-span-2 space-y-6">
-          <p className="text-zinc-300 text-base leading-relaxed font-light">
-            {content.bio}
-          </p>
+          <MarkdownRenderer
+            content={content.bio}
+            className="text-zinc-300 text-base font-light"
+          />
           {content.skills.length > 0 && (
             <div className="space-y-3">
               <h3 className="text-sm font-semibold tracking-wider text-zinc-400 uppercase">Core Skills</h3>
