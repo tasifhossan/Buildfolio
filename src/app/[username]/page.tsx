@@ -4,6 +4,8 @@ import { SectionRenderer } from "@/components/portfolio/SectionRenderer";
 import { PortfolioHeader } from "@/components/portfolio/sections/PortfolioHeader";
 import { Preloader } from "@/components/portfolio/Preloader";
 import { PortfolioThemeWrapper } from "@/components/portfolio/PortfolioThemeWrapper";
+import { AnalyticsTracker } from "@/components/portfolio/AnalyticsTracker";
+import Script from "next/script";
 import Link from "next/link";
 import type { Metadata } from "next";
 import React from "react";
@@ -97,6 +99,25 @@ export default async function UsernamePage({ params }: PageProps) {
 
   return (
     <PortfolioThemeWrapper fontClass={fontClass} customStyles={customStyles}>
+      <AnalyticsTracker portfolioId={portfolio.id} />
+
+      {/* Per-user Google Analytics — only fires if the portfolio owner has set their own GA ID */}
+      {portfolio.settings?.googleAnalyticsId && (
+        <>
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${portfolio.settings.googleAnalyticsId}`}
+            strategy="afterInteractive"
+          />
+          <Script id={`user-ga-${portfolio.id}`} strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${portfolio.settings.googleAnalyticsId}');
+            `}
+          </Script>
+        </>
+      )}
       <Preloader
         showPreloader={portfolio.settings?.showPreloader ?? false}
         logoUrl={portfolio.settings?.logoUrl}
