@@ -1,138 +1,176 @@
-# Buildfolio
+# Buildfolio 🚀
+A multi-tenant, highly customizable portfolio builder web application designed for developers and creators. Users can sign up, select starter templates, dynamically arrange section layouts, and publish their personal portfolio pages with automatic theme preferences and custom search engine optimizations.
 
-A multi-tenant, scalable portfolio-builder web app where users can sign up, choose from pre-made templates (or start blank), and dynamically manage the sections, content, and settings of their public portfolio page — all from a personal admin dashboard, with instant live previews and real-time public updates.
+---
+
+## Table of Contents
+
+- [About the Project](#about-the-project)
+- [Project Overview](#project-overview)
+- [Key Features](#key-features)
+- [Tech Stack](#tech-stack)
+- [Dependencies](#dependencies)
+- [Installation️ & Setup](#installation--setup)
+- [Folder Structure](#folder-structure)
+- [Contributions](#contributions)
+- [How to Contribute](#how-to-contribute)
+- [License](#license)
+- [Contact](#contact)
+
+---
+
+## About the Project
+
+Buildfolio is built from the ground up to solve the complexity of showcasing developer accomplishments. Instead of hosting separate repositories or manually writing CSS templates, creators can manage all elements of their digital identity in one dedicated dashboard.
+
+Every user gets their own live public portfolio link. The frontend dynamically pulls structured data, verifies content formats using modern schema parsers, and updates public page instances automatically with instant cache revalidation.
+
+---
+
+## Project Overview
+
+> Buildfolio is a multi-tenant platform. Portfolios are served via customizable path slugs (or custom domain mappings) driven by Next.js middleware. By rewriting domain and host headers in the background, users have their projects served directly at the root level while administrative dashboard tasks are securely separated on root application paths.
+
+---
+
+## Key Features
+
+- 📂 **Resume PDF Hosting:** Direct-upload CV hosting with integrated header download buttons.
+- 🌓 **Dark / Light Mode Toggle:** Seamless client-side theme switching with `localStorage` memory and automatic system preference detection.
+- 📊 **Platform & Custom Analytics:** Integrated platform-wide visitor logs alongside optional user-configured Google Analytics 4 Measurement properties.
+- 🔄 **Split-Pane Live Preview:** Real-time preview panels inside the editor showing draft layout changes before publishing.
+- 🎨 **Accent Customization:** Presets and custom HEX palette options matched with typography selectors.
+- 🛡️ **Identity Management:** Adjustable portfolio URLs (slugs) protected by unique availability checking and 30-day change cooldown limits.
+- 🚀 **Dynamic Section Editor:** Simple `@dnd-kit` drag-and-drop mechanics to reorder, add, remove, and hide sections.
+
+---
 
 ## Tech Stack
 
-- **Framework:** Next.js (App Router) + TypeScript
-- **ORM:** Prisma 7 (driver adapters via `@prisma/adapter-pg`)
-- **Database:** PostgreSQL via Supabase
-- **Auth:** NextAuth v5 (Credentials provider, bcrypt password hashing)
-- **Image storage:** Cloudinary
-- **Validation:** Zod (shared between forms, API routes, and public rendering)
-- **Styling:** Tailwind CSS
-- **Drag & drop:** `@dnd-kit`
+| Component | Technology | Description |
+| :--- | :--- | :--- |
+| **Framework** | Next.js 15 (App Router) | React application structure |
+| **Language** | TypeScript | Strong typing and compilation security |
+| **Database** | PostgreSQL (Neon) | Relational database hosting |
+| **ORM** | Prisma 7 | Schema modeling and migration client |
+| **Auth** | NextAuth v5 (Beta) | Hashed credential authentication |
+| **Hosting** | Vercel | Dynamic edge-rendering hosting platform |
+| **Storage** | Cloudinary | Asset delivery pipeline for images and PDFs |
 
-## Architecture Overview
+---
 
-Buildfolio is multi-tenant by design. Each user owns exactly one `Portfolio`, made up of ordered `Section` rows with flexible JSON content validated per section type with Zod. New users start with a blank portfolio and can apply a pre-built `Template` from the dashboard at any time — which clones its `TemplateSection` rows into their own `Section` rows — or build sections manually from scratch.
+## Dependencies
 
-Public portfolios are served via **subdomain-based routing** (`username.domain.com`), resolved through Next.js middleware that rewrites subdomain requests to the underlying `[username]` dynamic route, while explicitly excluding auth and dashboard paths from the rewrite so those only ever resolve on the root domain. Public pages use Incremental Static Regeneration (ISR) with on-demand revalidation triggered on every content-changing API call, so edits reflect on the live page within seconds rather than waiting on the cache window.
+### Core Production Dependencies
+- **Authentication:** `next-auth` (Credentials provider), `bcryptjs`
+- **Asset Uploads:** `cloudinary`
+- **Drag & Drop:** `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`
+- **Validation:** `zod`
+- **Database Connection:** `@prisma/adapter-pg`, `@prisma/client`, `pg`
+- **Icons:** `lucide-react`
 
-## Data Model
+### Development Tools
+- **Linter:** `eslint`, `eslint-config-next`
+- **Compiler:** `typescript`
+- **ORM CLI:** `prisma`
+- **Styles:** `tailwindcss` (v4), `@tailwindcss/postcss`
 
-| Model | Purpose |
-|---|---|
-| `User` | Account credentials (email, hashed password) |
-| `Portfolio` | One per user; holds a unique public `slug` and optional `templateId` |
-| `Section` | Ordered, toggleable content blocks (`type`, `order`, `isVisible`, `content` JSON) belonging to a portfolio |
-| `Settings` | Per-portfolio theme color, font, and SEO metadata |
-| `Template` | A named, selectable starting layout (e.g. "Minimal", "Developer") |
-| `TemplateSection` | Starter section content belonging to a `Template`, cloned into `Section` rows on selection |
-| `SlugHistory` | Records a portfolio's previous slugs so old URLs redirect cleanly after a username change |
-| `Account` / `Session` / `VerificationToken` | NextAuth adapter tables (present in schema for future OAuth/session-strategy flexibility; current auth uses Credentials + JWT sessions, so these are currently unused) |
+---
 
-Foreign keys use cascading deletes, and indexes are set on `slug` and all foreign-key columns for query performance at scale.
+## Installation️ & Setup
 
-## Progress
+### Prerequisites
+- Node.js (v18.x or higher)
+- A PostgreSQL database instance (Supabase or Neon)
+- A Cloudinary account for file storage
 
-### ✅ Phase 1 — Foundation
-- Scaffolded Next.js + TypeScript + Tailwind + ESLint project
-- Designed and migrated the full Prisma schema
-- Resolved Prisma 7 breaking changes (driver-adapter model, `directUrl` moved to `prisma.config.ts` for CLI/migrations, singleton client via `PrismaPg` adapter for runtime)
-- Seeded two demo templates ("Minimal", "Developer") with starter sections
+### Step-by-Step Installation
 
-### ✅ Phase 2 — Auth & Multi-tenancy
-- NextAuth v5 with Credentials provider, bcrypt-hashed passwords
-- Signup creates a `User` and a blank `Portfolio` (auto-generated unique slug) in a single transaction
-- Tenant-scoping helper ensures every dashboard/API query filters strictly by the authenticated user's ownership
-- Middleware-protected `/dashboard` routes
-- Template selection as an explicit dashboard action (not forced onboarding): list active templates, clone a template's sections into the user's portfolio inside a transaction, scoped by session — not client-supplied IDs
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/tasifhossan/Buildfolio.git
+   cd Buildfolio
+   ```
 
-### ✅ Phase 3 — Public Portfolio Rendering
-- Dynamic `[username]` route rendering only visible, ordered sections
-- `SectionRenderer` dispatches each `Section.type` to its matching presentational component, with Zod-validated content
-- Per-portfolio SEO metadata with sensible fallbacks
-- ISR caching, graceful empty-state placeholder, clean 404 handling for unknown slugs
-- **Subdomain routing**: middleware-based `Host` header detection and rewrite, with reserved app paths (`/api`, `/signup`, `/login`, `/dashboard`) explicitly excluded so auth/dashboard only ever resolve on the root domain — tested locally via `*.localhost`, ready to activate on a real domain via one env var (`NEXT_PUBLIC_ROOT_DOMAIN`) with no code changes
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-### ✅ Phase 4 — Admin Dashboard
-- **Section management**: drag-and-drop reordering (`@dnd-kit`), visibility toggles, add-section (with warn-before-duplicate-type confirmation), delete with confirmation — all with strict per-user ownership checks on every endpoint
-- **Content editing forms**, fully controlled (`value`/`onChange`) for live preview support:
-  - **Hero** — title, subtitle
-  - **About** — bio + interactive skill-tag chips
-  - **Contact** — email, GitHub/LinkedIn as clickable links
-  - **Projects** — array of project items (title, description, link, image), with Cloudinary upload per item and thumbnail preview
-- **Settings panel** — theme color (presets + custom hex), font family, SEO title/description
-- **On-demand revalidation** — every content-changing endpoint (section CRUD, reorder, apply-template, settings) triggers `revalidatePath`, verified to update the public page within seconds against an actual production build (`next build && next start`), not just dev mode
-- **Live preview** — split-pane editor showing unsaved draft content rendered through the same public-facing components in real time, confirmed to never persist until "Save" is explicitly clicked
+3. **Configure Environment Variables:**
+   Create a `.env` file in the root directory by copying the example template:
+   ```bash
+   cp .env.example .env
+   ```
+   Provide your local credentials:
+   - `DATABASE_URL` / `DIRECT_URL` (PostgreSQL connection strings)
+   - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
+   - `AUTH_SECRET` (Unique secret key for auth tokens)
+   - `NEXT_PUBLIC_ROOT_DOMAIN` (Your local host domain, e.g., `localhost:3000`)
 
-## Deployment Notes
+4. **Sync the Database Schema:**
+   Generate the Prisma client and apply migrations:
+   ```bash
+   npx prisma migrate dev
+   npx prisma generate
+   ```
 
-- Designed for **Vercel free tier** deployment for an initial small-scale pilot (5–10 users)
-- Domain-agnostic: subdomain routing is driven entirely by `NEXT_PUBLIC_ROOT_DOMAIN`, so buying a real domain later is a config change, not a code change
-- Wildcard subdomains require nameserver control of an owned domain and are supported on Vercel's free Hobby tier; Vercel's own `*.vercel.app` domain cannot support arbitrary per-tenant subdomains
-- Requires a unique, freshly generated `AUTH_SECRET` for any deployed environment (never reuse a local dev secret)
+5. **Start the Development Server:**
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000) to view the landing page.
 
-## Up Next
+---
 
-- Deploy to Vercel for the initial pilot (path-based portfolio links until a domain is purchased)
-- Optional: full-portfolio preview mode (view the entire live-styled portfolio without leaving the dashboard)
-- Production hardening: rate limiting on signup/upload endpoints, error monitoring, root-domain landing page
-
-## Development Workflow
-
-This project uses a branching model to keep `main` stable for production:
+## Folder Structure
 
 ```
-main        → production (deployed to Vercel)
-develop     → integration branch (features merged here first, tested together)
-feature/*   → one branch per feature (e.g. feature/preloader, feature/logo-upload)
+Buildfolio/
+├── prisma/               # Schema configuration and migrations
+├── public/               # Static assets and icons
+└── src/
+    ├── app/              # Next.js pages, API endpoints, and layouts
+    ├── components/       # Shared UI components and edit forms
+    ├── lib/              # Client loaders, Auth helpers, and databases
+    └── middleware.ts     # Path routing and subdomain rewrites
 ```
 
-Feature work never lands directly on `main` or `develop` — each feature is built on its own `feature/*` branch, verified, then merged into `develop`. `develop` is merged into `main` only as a deliberate release step.
+---
 
-## Roadmap — Advanced Features
+## Contributions
 
-Beyond the core MVP (Phases 1–4), the following features have been identified for future development. None are built yet unless noted otherwise.
+We welcome contributions of all types! Whether you are fixing bugs, creating new section templates, styling components, or updating technical docs, your help is highly appreciated.
 
-**New section types**
-- Experience/Work History (timeline)
-- Education
-- Testimonials
-- Skills with proficiency bars/ratings
-- Blog/Articles feed
-- Image gallery
-- Certifications/Awards
-- Services/Pricing
-- Stats/counters
-- Custom HTML/Markdown block
-- Pre-footer (CTA banner before the footer)
+---
 
-**Customization depth**
-- Multiple layout variants per section (e.g. Projects as grid/list/carousel)
-- Per-section background/spacing controls
-- Multiple font pairing options
-- Dark/light mode toggle per portfolio
-- Custom CSS injection (advanced — needs sanitization)
+## How to Contribute
 
-**Branding & identity**
-- ✅ **Logo upload** — via Cloudinary, attached to Settings, rendered in the preloader and (extendable to) other public-facing spots
-- ✅ **Custom/changeable username (slug)** — live availability checking, reserved-word blocklist (kept in sync with middleware's reserved app paths), 30-day change cooldown, and automatic redirect from old slug to new via a `SlugHistory` table
-- ✅ **Preloader** — branded fade-in loading screen (uses uploaded logo if set, otherwise initials derived from name or slug), toggleable per-portfolio via Settings, with a hard fallback timeout so it can never get stuck
+1. Fork this Repository.
+2. Create a new branch for your feature or bugfix:
+   ```bash
+   git checkout -b feature/your-awesome-feature
+   ```
+3. Commit your changes:
+   ```bash
+   git commit -m "feat: add support for awesome new feature"
+   ```
+4. Push your branch to the remote origin:
+   ```bash
+   git push origin feature/your-awesome-feature
+   ```
+5. Submit a Pull Request targeting the `develop` branch.
 
-**Sharing & distribution**
-- Custom domain support (bring-your-own-domain)
-- Portfolio analytics (views, referrer sources)
-- Resume/CV PDF export
-- Password-protected/private portfolios
-- Social share preview cards (OpenGraph images per portfolio)
+---
 
-**Platform-level features**
-- Multiple portfolios per user (schema already supports this loosely via the existing one-to-many relation)
-- Draft vs. published states (instead of instant revalidation)
-- Team/collaborative editing
-- Template marketplace
-- SEO tools (sitemap generation, structured data/JSON-LD)
-- Custom, user-defined sections (larger initiative — effectively a mini page-builder, requires more validation/sanitization work)
-- Category-filterable project grids (e.g. mixitup-style filtering) — treated as a layout variant of the Projects section rather than a generic plugin system
+## License
+
+This project is licensed under the **MIT License**. Feel free to use, modify, and distribute it as needed.
+
+---
+
+## Contact
+
+- **Author:** Tasif Hossan
+- **GitHub:** [@tasifhossan](https://github.com/tasifhossan)
+- **Project URL:** [https://github.com/tasifhossan/Buildfolio](https://github.com/tasifhossan/Buildfolio)
