@@ -5,9 +5,10 @@ import React, { useState } from "react";
 interface PortfolioHeaderProps {
   username: string;
   menuLinks: { name: string; id: string }[];
+  resumeUrl?: string | null;
 }
 
-export function PortfolioHeader({ username, menuLinks }: PortfolioHeaderProps) {
+export function PortfolioHeader({ username, menuLinks, resumeUrl }: PortfolioHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleScroll = (id: string) => {
@@ -50,10 +51,41 @@ export function PortfolioHeader({ username, menuLinks }: PortfolioHeaderProps) {
               {link.name}
             </button>
           ))}
+
+          {/* Download Resume Button — only shown if resume is uploaded */}
+          {resumeUrl && (
+            <a
+              href={resumeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 py-1.5 rounded-lg border border-[var(--theme-primary)] text-[var(--theme-primary)] hover:bg-[var(--theme-primary)] hover:text-white transition-all duration-150"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Resume
+            </a>
+          )}
         </nav>
 
         {/* Mobile Nav Toggle */}
-        <div className="md:hidden">
+        <div className="md:hidden flex items-center gap-3">
+          {/* Mobile Download Resume — inline icon button */}
+          {resumeUrl && (
+            <a
+              href={resumeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+              className="text-[var(--theme-primary)] hover:opacity-75 transition-opacity"
+              title="Download Resume"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </a>
+          )}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="text-zinc-400 hover:text-white p-2"
@@ -84,6 +116,20 @@ export function PortfolioHeader({ username, menuLinks }: PortfolioHeaderProps) {
               {link.name}
             </button>
           ))}
+          {resumeUrl && (
+            <a
+              href={resumeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+              className="flex items-center gap-2 py-2 text-sm font-semibold text-[var(--theme-primary)] hover:opacity-75 transition-opacity"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Download Resume
+            </a>
+          )}
         </div>
       )}
     </header>
