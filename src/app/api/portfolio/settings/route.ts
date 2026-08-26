@@ -17,6 +17,11 @@ const settingsSchema = z.object({
   seoTitle: z.string().max(100, "SEO Title cannot exceed 100 characters").optional().or(z.literal("")),
   seoDescription: z.string().max(200, "SEO Description cannot exceed 200 characters").optional().or(z.literal("")),
   logoUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  googleAnalyticsId: z
+    .string()
+    .regex(/^G-[A-Z0-9]+$/, "Must be a valid GA4 Measurement ID (e.g. G-XXXXXXXXXX)")
+    .optional()
+    .or(z.literal("")),
 });
 
 export async function PATCH(req: Request) {
@@ -48,7 +53,7 @@ export async function PATCH(req: Request) {
       );
     }
 
-    const { themeColor, fontFamily, seoTitle, seoDescription, logoUrl } = parseResult.data;
+    const { themeColor, fontFamily, seoTitle, seoDescription, logoUrl, googleAnalyticsId } = parseResult.data;
 
     // Fetch user's portfolio to check ownership and get the slug
     const portfolio = await prisma.portfolio.findFirst({
@@ -71,6 +76,7 @@ export async function PATCH(req: Request) {
         seoTitle: seoTitle || null,
         seoDescription: seoDescription || null,
         logoUrl: logoUrl || null,
+        googleAnalyticsId: googleAnalyticsId || null,
       },
       create: {
         portfolioId: portfolio.id,
@@ -79,6 +85,7 @@ export async function PATCH(req: Request) {
         seoTitle: seoTitle || null,
         seoDescription: seoDescription || null,
         logoUrl: logoUrl || null,
+        googleAnalyticsId: googleAnalyticsId || null,
       },
     });
 

@@ -76,6 +76,7 @@ model Portfolio {
   sections      Section[]
   settings      Settings?
   slugHistories SlugHistory[]
+  analytics     DailyAnalytics[]
 
   @@index([slug])
   @@index([templateId])
@@ -106,15 +107,16 @@ model Section {
 }
 
 model Settings {
-  id             String    @id @default(cuid())
-  portfolioId    String    @unique
-  portfolio      Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
-  themeColor     String?
-  fontFamily     String?
-  seoTitle       String?
-  seoDescription String?
-  logoUrl        String?
-  showPreloader  Boolean   @default(false)
+  id                String    @id @default(cuid())
+  portfolioId       String    @unique
+  portfolio         Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  themeColor        String?
+  fontFamily        String?
+  seoTitle          String?
+  seoDescription    String?
+  logoUrl           String?
+  showPreloader     Boolean   @default(false)
+  googleAnalyticsId String?   // User's own GA4 Measurement ID (e.g. G-XXXXXXXXXX)
 }
 
 model Template {
@@ -143,4 +145,14 @@ model TemplateSection {
   @@index([templateId, order])
 }
 
+model DailyAnalytics {
+  id          String    @id @default(cuid())
+  portfolioId String
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  date        DateTime  // Truncated to YYYY-MM-DD
+  views       Int       @default(0)
+  clicks      Int       @default(0)
 
+  @@unique([portfolioId, date])
+  @@index([portfolioId])
+}
