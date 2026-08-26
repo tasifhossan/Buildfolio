@@ -268,6 +268,12 @@ export function ExperienceForm({ value, onChange, onSave, isSaving = false }: Ex
                       className="w-full bg-zinc-900/60 border border-zinc-800/80 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg px-3 py-2 text-xs text-zinc-200 transition outline-none placeholder:text-zinc-600 disabled:opacity-50 resize-none"
                       placeholder="Describe your responsibilities, key achievements, or technologies used..."
                     />
+                    <p className="text-[10px] text-zinc-500 flex items-center gap-1.5 mt-1 select-none">
+                      <svg className="w-3.5 h-3.5 text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Supports basic markdown: <strong>**bold**</strong>, <em>*italic*</em>, <code>`code`</code>, <span className="underline">[link](url)</span>.
+                    </p>
                   </div>
                 </div>
               );
