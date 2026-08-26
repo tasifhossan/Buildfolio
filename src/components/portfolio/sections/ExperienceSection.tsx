@@ -1,5 +1,6 @@
 import React from "react";
 import type { ExperienceContent } from "../SectionRenderer";
+import { MarkdownRenderer } from "../MarkdownRenderer";
 
 interface ExperienceSectionProps {
   content: ExperienceContent;
@@ -73,9 +74,10 @@ export function ExperienceSection({ content }: ExperienceSectionProps) {
                     </p>
                   </div>
                   
-                  <p className="text-zinc-400 text-sm font-light leading-relaxed whitespace-pre-line">
-                    {item.description}
-                  </p>
+                  <MarkdownRenderer
+                    content={item.description}
+                    className="text-zinc-400 text-sm font-light"
+                  />
                 </div>
               </div>
             ))

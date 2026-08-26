@@ -33,53 +33,55 @@ export function HeroForm({ value, onChange, onSave, isSaving = false }: HeroForm
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 animate-[cardFadeIn_0.3s_cubic-bezier(0.16,1,0.3,1)]">
-      <div className="space-y-1.5">
-        <label htmlFor="hero-title" className="text-xs font-semibold text-zinc-400">
-          Title
-        </label>
-        <input
-          id="hero-title"
-          type="text"
-          value={title}
-          onChange={(e) => handleChange("title", e.target.value)}
-          disabled={isSaving}
-          className="w-full bg-zinc-950/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-xs text-zinc-100 transition duration-150 outline-none placeholder:text-zinc-600 disabled:opacity-50"
-          placeholder="Welcome to my portfolio"
-        />
+    <form onSubmit={handleSubmit} className="flex flex-col h-full min-h-0 space-y-4 animate-[cardFadeIn_0.3s_cubic-bezier(0.16,1,0.3,1)]">
+      <div className="flex-1 overflow-y-auto pr-2 space-y-4">
+        <div className="space-y-1.5">
+          <label htmlFor="hero-title" className="text-xs font-semibold text-zinc-400">
+            Title
+          </label>
+          <input
+            id="hero-title"
+            type="text"
+            value={title}
+            onChange={(e) => handleChange("title", e.target.value)}
+            disabled={isSaving}
+            className="w-full bg-zinc-950/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-xs text-zinc-100 transition duration-150 outline-none placeholder:text-zinc-600 disabled:opacity-50"
+            placeholder="Welcome to my portfolio"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="hero-subtitle" className="text-xs font-semibold text-zinc-400">
+            Subtitle
+          </label>
+          <textarea
+            id="hero-subtitle"
+            value={subtitle}
+            onChange={(e) => handleChange("subtitle", e.target.value)}
+            disabled={isSaving}
+            rows={3}
+            className="w-full bg-zinc-950/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-xs text-zinc-100 transition duration-150 outline-none placeholder:text-zinc-600 disabled:opacity-50 resize-none"
+            placeholder="Describe what you build or do"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="hero-cta" className="text-xs font-semibold text-zinc-400">
+            Call to Action Button Text (Optional)
+          </label>
+          <input
+            id="hero-cta"
+            type="text"
+            value={ctaText}
+            onChange={(e) => handleChange("ctaText", e.target.value)}
+            disabled={isSaving}
+            className="w-full bg-zinc-950/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-xs text-zinc-100 transition duration-150 outline-none placeholder:text-zinc-600 disabled:opacity-50"
+            placeholder="e.g. View Projects"
+          />
+        </div>
       </div>
 
-      <div className="space-y-1.5">
-        <label htmlFor="hero-subtitle" className="text-xs font-semibold text-zinc-400">
-          Subtitle
-        </label>
-        <textarea
-          id="hero-subtitle"
-          value={subtitle}
-          onChange={(e) => handleChange("subtitle", e.target.value)}
-          disabled={isSaving}
-          rows={3}
-          className="w-full bg-zinc-950/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-xs text-zinc-100 transition duration-150 outline-none placeholder:text-zinc-600 disabled:opacity-50 resize-none"
-          placeholder="Describe what you build or do"
-        />
-      </div>
-
-      <div className="space-y-1.5">
-        <label htmlFor="hero-cta" className="text-xs font-semibold text-zinc-400">
-          Call to Action Button Text (Optional)
-        </label>
-        <input
-          id="hero-cta"
-          type="text"
-          value={ctaText}
-          onChange={(e) => handleChange("ctaText", e.target.value)}
-          disabled={isSaving}
-          className="w-full bg-zinc-950/60 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl px-4 py-2.5 text-xs text-zinc-100 transition duration-150 outline-none placeholder:text-zinc-600 disabled:opacity-50"
-          placeholder="e.g. View Projects"
-        />
-      </div>
-
-      <div className="flex justify-end pt-2">
+      <div className="flex justify-end pt-3 border-t border-zinc-850 shrink-0">
         <button
           type="submit"
           disabled={isSaving}
