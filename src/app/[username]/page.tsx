@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { SectionRenderer } from "@/components/portfolio/SectionRenderer";
 import { PortfolioHeader } from "@/components/portfolio/sections/PortfolioHeader";
 import { Preloader } from "@/components/portfolio/Preloader";
+import { PortfolioThemeWrapper } from "@/components/portfolio/PortfolioThemeWrapper";
 import { AnalyticsTracker } from "@/components/portfolio/AnalyticsTracker";
 import Script from "next/script";
 import Link from "next/link";
@@ -97,10 +98,7 @@ export default async function UsernamePage({ params }: PageProps) {
   }));
 
   return (
-    <div
-      style={customStyles}
-      className={`min-h-screen bg-[#09090b] text-[#f4f4f5] antialiased selection:bg-[var(--theme-primary)] selection:text-white ${fontClass}`}
-    >
+    <PortfolioThemeWrapper fontClass={fontClass} customStyles={customStyles}>
       <AnalyticsTracker portfolioId={portfolio.id} />
 
       {/* Per-user Google Analytics — only fires if the portfolio owner has set their own GA ID */}
@@ -120,7 +118,6 @@ export default async function UsernamePage({ params }: PageProps) {
           </Script>
         </>
       )}
-
       <Preloader
         showPreloader={portfolio.settings?.showPreloader ?? false}
         logoUrl={portfolio.settings?.logoUrl}
@@ -166,6 +163,6 @@ export default async function UsernamePage({ params }: PageProps) {
           </Link>
         </div>
       </footer>
-    </div>
+    </PortfolioThemeWrapper>
   );
 }
