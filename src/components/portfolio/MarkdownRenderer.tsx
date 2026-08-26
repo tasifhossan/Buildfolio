@@ -52,7 +52,7 @@ function parseInlineMarkdown(text: string): React.ReactNode[] {
         continue;
       }
 
-      let remaining = token.content;
+      const remaining = token.content;
       let match;
       regex.lastIndex = 0;
 
