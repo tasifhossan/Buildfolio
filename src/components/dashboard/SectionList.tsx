@@ -577,36 +577,36 @@ export function SectionList() {
       {/* Custom Edit Modal with Glassmorphism */}
       {editingSection && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]">
-          <div className="max-w-5xl w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl space-y-6 animate-[scaleIn_0.2s_ease-out]">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+          <div className="max-w-5xl w-full max-h-[90vh] bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl animate-[scaleIn_0.2s_ease-out] flex flex-col overflow-hidden">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-3 mb-4 shrink-0">
+              <h3 className="text-base font-bold text-zinc-100 flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                Edit {editingSection.type} Section
+              </h3>
+              <button
+                onClick={() => setEditingSection(null)}
+                disabled={isSavingSection}
+                className="text-zinc-500 hover:text-zinc-300 transition cursor-pointer disabled:opacity-50"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {editError && (
+              <div className="bg-red-950/30 border border-red-900/30 text-red-400 px-4 py-3 rounded-xl text-xs flex items-start gap-2.5 mb-4 shrink-0">
+                <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{editError}</span>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch min-h-0 flex-1 overflow-hidden">
               {/* Left Pane - Form */}
-              <div className="space-y-6 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between border-b border-zinc-800 pb-3 mb-4">
-                    <h3 className="text-base font-bold text-zinc-100 flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
-                      Edit {editingSection.type} Section
-                    </h3>
-                    <button
-                      onClick={() => setEditingSection(null)}
-                      disabled={isSavingSection}
-                      className="text-zinc-500 hover:text-zinc-300 transition cursor-pointer disabled:opacity-50"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  {editError && (
-                    <div className="bg-red-950/30 border border-red-900/30 text-red-400 px-4 py-3 rounded-xl text-xs flex items-start gap-2.5 mb-4">
-                      <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span>{editError}</span>
-                    </div>
-                  )}
-
+              <div className="flex flex-col min-h-0 h-full overflow-hidden">
+                <div className="flex-1 overflow-y-auto pr-3 space-y-4">
                   {editingSection.type === "Hero" ? (
                     <HeroForm
                       value={draftContent as HeroContent}
@@ -664,7 +664,7 @@ export function SectionList() {
               </div>
 
               {/* Right Pane - Live Preview */}
-              <div className="bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden shadow-inner flex flex-col min-h-[350px] lg:min-h-[500px]">
+              <div className="bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden shadow-inner flex flex-col min-h-0 h-full">
                 <div className="bg-zinc-900/60 px-4 py-2.5 border-b border-zinc-800/80 flex items-center gap-1.5 shrink-0 select-none">
                   <span className="w-2.5 h-2.5 rounded-full bg-red-500/80"></span>
                   <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>

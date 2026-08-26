@@ -27,7 +27,7 @@ export function ProjectsSection({ content }: ProjectsSectionProps) {
             {projectsList.map((project, idx) => {
               const projectTitle = project.name || project.title || "Untitled Project";
               const Card = () => (
-                <div className="h-full bg-zinc-950/40 border border-zinc-900 hover:border-zinc-800 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20 group flex flex-col justify-between">
+                <div className="flex-1 bg-zinc-950/40 border border-zinc-900 hover:border-zinc-800 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20 group flex flex-col justify-between">
                   <div>
                     <div className="w-full aspect-video overflow-hidden border-b border-zinc-900 bg-zinc-950 relative flex items-center justify-center">
                       {project.imageUrl ? (
@@ -93,7 +93,7 @@ export function ProjectsSection({ content }: ProjectsSectionProps) {
                     href={project.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block h-full cursor-pointer"
+                    className="flex flex-col h-full cursor-pointer"
                   >
                     <Card />
                   </a>
@@ -101,7 +101,7 @@ export function ProjectsSection({ content }: ProjectsSectionProps) {
               }
 
               return (
-                <div key={idx} className="block h-full">
+                <div key={idx} className="flex flex-col h-full">
                   <Card />
                 </div>
               );
