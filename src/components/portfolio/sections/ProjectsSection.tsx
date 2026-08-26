@@ -1,5 +1,6 @@
 import React from "react";
 import type { ProjectsContent } from "../SectionRenderer";
+import { MarkdownRenderer } from "../MarkdownRenderer";
 
 interface ProjectsSectionProps {
   content: ProjectsContent;
@@ -71,9 +72,10 @@ export function ProjectsSection({ content }: ProjectsSectionProps) {
                           </svg>
                         )}
                       </div>
-                      <p className="text-zinc-400 text-sm font-light mt-3 leading-relaxed">
-                        {project.description}
-                      </p>
+                      <MarkdownRenderer
+                        content={project.description}
+                        className="text-zinc-400 text-sm font-light mt-3"
+                      />
                     </div>
                   </div>
                   {project.link && (

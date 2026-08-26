@@ -1,5 +1,6 @@
 import React from "react";
 import type { TestimonialsContent } from "../SectionRenderer";
+import { MarkdownRenderer } from "../MarkdownRenderer";
 
 interface TestimonialsSectionProps {
   content: TestimonialsContent;
@@ -52,9 +53,9 @@ export function TestimonialsSection({ content }: TestimonialsSectionProps) {
                 </div>
 
                 <div className="relative z-10 space-y-6 flex-1 flex flex-col justify-between">
-                  <p className="text-zinc-300 text-sm leading-relaxed italic font-light">
-                    &ldquo;{item.quote}&rdquo;
-                  </p>
+                  <div className="text-zinc-300 text-sm italic font-light">
+                    &ldquo;<MarkdownRenderer content={item.quote} className="inline-block" />&rdquo;
+                  </div>
 
                   <div className="flex items-center gap-3 pt-4 border-t border-zinc-900/50">
                     {item.photoUrl ? (
