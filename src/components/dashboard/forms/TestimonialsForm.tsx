@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 
 export interface TestimonialItem {
   name?: string;
@@ -9,7 +9,10 @@ export interface TestimonialItem {
   photoUrl?: string;
 }
 
+export type TestimonialsLayout = "grid" | "carousel";
+
 export interface TestimonialsContent {
+  layout?: TestimonialsLayout;
   items?: TestimonialItem[];
 }
 
@@ -96,14 +99,78 @@ export function TestimonialsForm({ value, onChange, onSave, isSaving = false }: 
     });
   };
 
+  const handleLayoutChange = (layout: TestimonialsLayout) => {
+    onChange({
+      ...value,
+      layout,
+    });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave(value);
   };
 
+  const layout = value.layout ?? "grid";
+
+  const LAYOUT_OPTIONS: { value: TestimonialsLayout; label: string; icon: React.ReactNode }[] = [
+    {
+      value: "grid",
+      label: "Grid",
+      icon: (
+        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+        </svg>
+      ),
+    },
+    {
+      value: "carousel",
+      label: "Carousel",
+      icon: (
+        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 6H5a2 2 0 00-2 2v8a2 2 0 002 2h3M16 6h3a2 2 0 012 2v8a2 2 0 01-2 2h-3M8 6v12M16 6v12" />
+        </svg>
+      ),
+    },
+  ];
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col h-full min-h-0 space-y-4 animate-[cardFadeIn_0.3s_cubic-bezier(0.16,1,0.3,1)]">
       <div className="flex-1 overflow-y-auto pr-2 space-y-6">
+
+      {/* Layout Selector */}
+      <div className="space-y-1.5">
+        <label className="text-xs font-semibold text-zinc-400">Display Layout</label>
+        <div
+          role="group"
+          aria-label="Display Layout"
+          className="flex items-center bg-zinc-950/60 border border-zinc-800 rounded-xl p-1 gap-1"
+        >
+          {LAYOUT_OPTIONS.map((opt) => {
+            const isActive = layout === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                id={`testimonials-layout-${opt.value}`}
+                aria-pressed={isActive}
+                onClick={() => handleLayoutChange(opt.value)}
+                disabled={isSaving}
+                className={[
+                  "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-[11px] font-semibold transition-all duration-150 cursor-pointer disabled:opacity-50",
+                  isActive
+                    ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 shadow-sm"
+                    : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/60 border border-transparent",
+                ].join(" ")}
+              >
+                {opt.icon}
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Testimonials List Section */}
       <div className="space-y-4">
         <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2">
