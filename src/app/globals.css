@@ -183,3 +183,8 @@ body {
 .portfolio-root[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.25) !important;
 }
+
+/* Hide scrollbar on carousel track without disabling scroll */
+.carousel-track::-webkit-scrollbar {
+  display: none;
+}
