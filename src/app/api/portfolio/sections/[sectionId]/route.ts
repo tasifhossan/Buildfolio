@@ -25,6 +25,7 @@ const ProjectItemSchema = z.object({
 
 const ProjectsContentSchema = z.object({
   title: z.string().optional(),
+  layout: z.enum(["grid", "list", "carousel"]).optional(),
   list: z.array(ProjectItemSchema).optional(),
   items: z.array(ProjectItemSchema).optional(),
 });
@@ -59,6 +60,7 @@ const ExperienceItemSchema = z.object({
 );
 
 const ExperienceContentSchema = z.object({
+  layout: z.enum(["timeline", "list"]).optional(),
   items: z.array(ExperienceItemSchema).optional(),
 });
 
@@ -70,6 +72,7 @@ const TestimonialItemSchema = z.object({
 });
 
 const TestimonialsContentSchema = z.object({
+  layout: z.enum(["grid", "carousel"]).optional(),
   items: z.array(TestimonialItemSchema).optional(),
 });
 
