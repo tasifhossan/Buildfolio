@@ -29,6 +29,7 @@ export const ProjectItemSchema = z.object({
 
 export const ProjectsContentSchema = z.object({
   title: z.string().optional().default("Projects"),
+  layout: z.enum(["grid", "list", "carousel"]).optional().default("grid"),
   list: z.array(ProjectItemSchema).optional(),
   items: z.array(ProjectItemSchema).optional(),
 });
@@ -63,6 +64,7 @@ export const ExperienceItemSchema = z.object({
 );
 
 export const ExperienceContentSchema = z.object({
+  layout: z.enum(["timeline", "list"]).optional().default("timeline"),
   items: z.array(ExperienceItemSchema).optional().default([]),
 });
 
@@ -74,6 +76,7 @@ export const TestimonialItemSchema = z.object({
 });
 
 export const TestimonialsContentSchema = z.object({
+  layout: z.enum(["grid", "carousel"]).optional().default("grid"),
   items: z.array(TestimonialItemSchema).optional().default([]),
 });
 

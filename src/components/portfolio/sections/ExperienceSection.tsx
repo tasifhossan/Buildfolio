@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useRef } from "react";
 import type { ExperienceContent } from "../SectionRenderer";
 import { MarkdownRenderer } from "../MarkdownRenderer";
 
@@ -8,7 +10,7 @@ interface ExperienceSectionProps {
 
 const MONTHS = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
 
 function formatPeriod(
@@ -26,14 +28,95 @@ function formatPeriod(
   return endStr ? `${startStr} — ${endStr}` : startStr;
 }
 
+// ---------------------------------------------------------------------------
+// Shared entry card — used by both Timeline (stripped) and List variants
+// ---------------------------------------------------------------------------
+
+type ExperienceItem = NonNullable<ExperienceContent["items"]>[number];
+
+interface EntryProps {
+  item: ExperienceItem;
+  index: number;
+}
+
+function EntryBody({ item }: { item: ExperienceItem }) {
+  return (
+    <div className="space-y-2">
+      <span className="text-xs font-semibold tracking-wider uppercase text-indigo-400 group-hover:text-indigo-300 transition-colors duration-150">
+        {formatPeriod(item.startMonth, item.startYear, item.isCurrent, item.endMonth, item.endYear)}
+      </span>
+      <div>
+        <h3 className="text-lg font-bold text-zinc-100 group-hover:text-white transition-colors duration-150">
+          {item.role}
+        </h3>
+        <p className="text-sm font-medium text-zinc-400">{item.company}</p>
+      </div>
+      <MarkdownRenderer
+        content={item.description ?? ""}
+        className="text-zinc-400 text-sm font-light"
+      />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Timeline variant — pixel-identical to the original ExperienceSection
+// ---------------------------------------------------------------------------
+
+function TimelineLayout({ items }: { items: ExperienceItem[] }) {
+  return (
+    <div className="md:col-span-2 space-y-10 relative before:absolute before:inset-y-0 before:left-4 before:w-[1px] before:bg-zinc-800">
+      {items.length === 0 ? (
+        <p className="text-zinc-500 text-sm pl-8">No experience listed yet.</p>
+      ) : (
+        items.map((item, index) => (
+          <div key={index} className="relative pl-8 group">
+            {/* Timeline dot */}
+            <div
+              className="absolute left-4 top-1.5 w-3.5 h-3.5 rounded-full border-2 border-zinc-950 bg-zinc-800 group-hover:bg-[var(--theme-primary,#6366f1)] group-hover:border-[var(--theme-primary,#6366f1)] transition-all duration-300 transform -translate-x-1/2 shadow-sm group-hover:shadow-[0_0_8px_var(--theme-primary,#6366f1)]"
+            />
+            <EntryBody item={item} />
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// List variant — same entries, clean stacked cards, no timeline chrome
+// ---------------------------------------------------------------------------
+
+function ListLayout({ items }: { items: ExperienceItem[] }) {
+  return (
+    <div className="md:col-span-2 space-y-4">
+      {items.length === 0 ? (
+        <p className="text-zinc-500 text-sm">No experience listed yet.</p>
+      ) : (
+        items.map((item, index) => (
+          <div
+            key={index}
+            className="group bg-zinc-950/40 border border-zinc-900 hover:border-zinc-800 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/20"
+          >
+            <EntryBody item={item} />
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main section component
+// ---------------------------------------------------------------------------
+
 export function ExperienceSection({ content }: ExperienceSectionProps) {
   const items = content.items || [];
+  const layout = content.layout ?? "timeline";
 
-  // Sort items by startYear and startMonth descending (most recent first)
+  // Sort most-recent first (same logic as original)
   const sortedItems = [...items].sort((a, b) => {
-    if (b.startYear !== a.startYear) {
-      return b.startYear - a.startYear;
-    }
+    if (b.startYear !== a.startYear) return b.startYear - a.startYear;
     return b.startMonth - a.startMonth;
   });
 
@@ -45,44 +128,17 @@ export function ExperienceSection({ content }: ExperienceSectionProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-start">
         <div>
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-            <span className="w-1.5 h-8 rounded-full" style={{ backgroundColor: "var(--theme-primary, #6366f1)" }}></span>
+            <span className="w-1.5 h-8 rounded-full" style={{ backgroundColor: "var(--theme-primary, #6366f1)" }} />
             Experience
           </h2>
         </div>
-        <div className="md:col-span-2 space-y-10 relative before:absolute before:inset-y-0 before:left-4 before:w-[1px] before:bg-zinc-800">
-          {sortedItems.length === 0 ? (
-            <p className="text-zinc-500 text-sm pl-8">No experience listed yet.</p>
-          ) : (
-            sortedItems.map((item, index) => (
-              <div key={index} className="relative pl-8 group">
-                {/* Timeline dot */}
-                <div 
-                  className="absolute left-4 top-1.5 w-3.5 h-3.5 rounded-full border-2 border-zinc-950 bg-zinc-800 group-hover:bg-[var(--theme-primary,#6366f1)] group-hover:border-[var(--theme-primary,#6366f1)] transition-all duration-300 transform -translate-x-1/2 shadow-sm group-hover:shadow-[0_0_8px_var(--theme-primary,#6366f1)]"
-                />
-                
-                <div className="space-y-2">
-                  <span className="text-xs font-semibold tracking-wider uppercase text-indigo-400 group-hover:text-indigo-300 transition-colors duration-150">
-                    {formatPeriod(item.startMonth, item.startYear, item.isCurrent, item.endMonth, item.endYear)}
-                  </span>
-                  
-                  <div>
-                    <h3 className="text-lg font-bold text-zinc-100 group-hover:text-white transition-colors duration-150">
-                      {item.role}
-                    </h3>
-                    <p className="text-sm font-medium text-zinc-400">
-                      {item.company}
-                    </p>
-                  </div>
-                  
-                  <MarkdownRenderer
-                    content={item.description}
-                    className="text-zinc-400 text-sm font-light"
-                  />
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+
+        {layout === "list" ? (
+          <ListLayout items={sortedItems} />
+        ) : (
+          // "timeline" — default, pixel-identical to original
+          <TimelineLayout items={sortedItems} />
+        )}
       </div>
     </section>
   );
