@@ -7,6 +7,7 @@ import { getPortfolioUrl } from "@/lib/get-portfolio-url";
 import { SectionList } from "@/components/dashboard/SectionList";
 import { SettingsForm, Settings } from "@/components/dashboard/SettingsForm";
 import { AnalyticsDashboard } from "@/components/dashboard/AnalyticsDashboard";
+import { BlogDashboardManager } from "@/components/dashboard/BlogDashboardManager";
 
 interface HeroContent {
   title?: string;
@@ -66,7 +67,7 @@ interface DashboardClientProps {
 export function DashboardClient({ initialPortfolio }: DashboardClientProps) {
   const router = useRouter();
   const [portfolio, setPortfolio] = useState<Portfolio>(initialPortfolio);
-  const [activeTab, setActiveTab] = useState<"sections" | "settings" | "analytics">("sections");
+  const [activeTab, setActiveTab] = useState<"sections" | "analytics" | "blog" | "settings">("sections");
   const [showTemplateSelector, setShowTemplateSelector] = useState(
     portfolio.sections.length === 0
   );
@@ -386,6 +387,16 @@ export function DashboardClient({ initialPortfolio }: DashboardClientProps) {
                 Analytics
               </button>
               <button
+                onClick={() => setActiveTab("blog")}
+                className={`py-2.5 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition duration-150 cursor-pointer ${
+                  activeTab === "blog"
+                    ? "border-indigo-500 text-indigo-400"
+                    : "border-transparent text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                Blog
+              </button>
+              <button
                 onClick={() => setActiveTab("settings")}
                 className={`py-2.5 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition duration-150 cursor-pointer ${
                   activeTab === "settings"
@@ -401,6 +412,8 @@ export function DashboardClient({ initialPortfolio }: DashboardClientProps) {
               <SectionList key={refreshKey} />
             ) : activeTab === "analytics" ? (
               <AnalyticsDashboard portfolioId={portfolio.id} />
+            ) : activeTab === "blog" ? (
+              <BlogDashboardManager portfolioSlug={portfolio.slug} />
             ) : (
               <SettingsForm
                 portfolioId={portfolio.id}
