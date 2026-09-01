@@ -1,21 +1,12 @@
 import { prisma } from "@/lib/prisma";
+import { slugify } from "@/lib/slugify";
 
-/**
- * Normalizes text into a clean URL-friendly slug.
- */
-export function slugify(text: string): string {
-  const slug = text
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-
-  return slug || "untitled-post";
-}
+export { slugify };
 
 /**
  * Generates a unique slug for a blog post within a specific portfolio.
  * Appends numerical suffixes (-1, -2, etc.) if a collision exists for that portfolio.
+ * Server-only database helper.
  *
  * @param portfolioId Portfolio ID
  * @param baseText Raw title or candidate slug string

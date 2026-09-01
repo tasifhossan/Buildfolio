@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { RichTextEditor } from "@/components/dashboard/RichTextEditor";
-import { slugify } from "@/lib/blog-slug";
-import { X, Upload, Check, AlertCircle, Loader2, Image as ImageIcon } from "lucide-react";
+import { slugify } from "@/lib/slugify";
+import { X, Check, AlertCircle, Loader2, Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
 
 export interface BlogPost {
