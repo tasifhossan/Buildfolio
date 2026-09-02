@@ -105,7 +105,7 @@ interface SectionRendererProps {
   username?: string;
 }
 
-export async function SectionRenderer({ section, portfolioId, username }: SectionRendererProps) {
+export function SectionRenderer({ section, portfolioId, username }: SectionRendererProps) {
   // Safe validation wrapper to catch malformed data and prevent layout crashes
   try {
     const pId = section.portfolioId || portfolioId;

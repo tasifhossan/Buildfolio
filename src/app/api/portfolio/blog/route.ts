@@ -17,19 +17,48 @@ const createBlogPostSchema = z.object({
 
 /**
  * GET /api/portfolio/blog
- * Fetch all blog posts for the currently authenticated user's portfolio.
+ * Fetch blog posts for a specific portfolio (by username/portfolioId query params)
+ * or for the currently authenticated user's portfolio.
  */
-export async function GET() {
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
-  }
-
+export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const usernameParam = searchParams.get("username");
+    const portfolioIdParam = searchParams.get("portfolioId");
+
+    let targetPortfolioId = portfolioIdParam;
+
+    if (!targetPortfolioId && usernameParam) {
+      const portfolio = await prisma.portfolio.findUnique({
+        where: { slug: usernameParam },
+        select: { id: true },
+      });
+      targetPortfolioId = portfolio?.id || null;
+    }
+
+    if (targetPortfolioId) {
+      const posts = await prisma.blogPost.findMany({
+        where: {
+          portfolioId: targetPortfolioId,
+          isPublished: true,
+        },
+        orderBy: [
+          { publishedAt: "desc" },
+          { createdAt: "desc" },
+        ],
+      });
+      return NextResponse.json(posts);
+    }
+
+    const session = await auth();
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
     const portfolio = await prisma.portfolio.findFirst({
       where: { userId: session.user.id },
     });

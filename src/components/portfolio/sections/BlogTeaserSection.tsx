@@ -1,7 +1,8 @@
-import React from "react";
-import { prisma } from "@/lib/prisma";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import type { BlogTeaserContent } from "../SectionRenderer";
-import { BlogTeaserCarousel } from "./BlogTeaserCarousel";
+import { BlogTeaserCarousel, PostItem } from "./BlogTeaserCarousel";
 
 interface BlogTeaserSectionProps {
   content: BlogTeaserContent;
@@ -9,44 +10,51 @@ interface BlogTeaserSectionProps {
   username?: string;
 }
 
-export async function BlogTeaserSection({
+export function BlogTeaserSection({
   content,
   portfolioId,
   username,
 }: BlogTeaserSectionProps) {
+  const [posts, setPosts] = useState<PostItem[]>([]);
+  const [loaded, setLoaded] = useState<boolean>(false);
+
   const title = content.title || "From the Blog";
   const postCount = Math.min(Math.max(content.postCount ?? 3, 1), 6);
 
-  let targetPortfolioId = portfolioId;
-  let targetUsername = username || "";
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchPosts() {
+      try {
+        const queryParams = new URLSearchParams();
+        if (portfolioId) queryParams.set("portfolioId", portfolioId);
+        if (username) queryParams.set("username", username);
 
-  if (!targetPortfolioId && targetUsername) {
-    const portfolio = await prisma.portfolio.findUnique({
-      where: { slug: targetUsername },
-      select: { id: true },
-    });
-    targetPortfolioId = portfolio?.id;
-  }
+        const url = `/api/portfolio/blog${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+        const res = await fetch(url);
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted && Array.isArray(data)) {
+            setPosts(data);
+          }
+        }
+      } catch {
+        // Ignore fetch errors
+      } finally {
+        if (isMounted) setLoaded(true);
+      }
+    }
 
-  if (!targetPortfolioId) {
+    fetchPosts();
+    return () => {
+      isMounted = false;
+    };
+  }, [portfolioId, username]);
+
+  if (!loaded || posts.length === 0) {
     return null;
   }
 
-  const posts = await prisma.blogPost.findMany({
-    where: {
-      portfolioId: targetPortfolioId,
-      isPublished: true,
-    },
-    orderBy: [
-      { publishedAt: "desc" },
-      { createdAt: "desc" },
-    ],
-    take: postCount,
-  });
-
-  if (posts.length === 0) {
-    return null;
-  }
+  const displayedPosts = posts.slice(0, postCount);
 
   return (
     <section
@@ -62,7 +70,7 @@ export async function BlogTeaserSection({
           {title}
         </h2>
 
-        <BlogTeaserCarousel posts={posts} username={targetUsername} />
+        <BlogTeaserCarousel posts={displayedPosts} username={username || ""} />
       </div>
     </section>
   );
