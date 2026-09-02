@@ -7,7 +7,8 @@ import { ContactForm } from "./forms/ContactForm";
 import { ProjectsForm } from "./forms/ProjectsForm";
 import { ExperienceForm } from "./forms/ExperienceForm";
 import { TestimonialsForm } from "./forms/TestimonialsForm";
-import { SectionRenderer, HeroContent, AboutContent, ContactContent, ProjectsContent, ExperienceContent, TestimonialsContent } from "../portfolio/SectionRenderer";
+import { BlogTeaserForm } from "./forms/BlogTeaserForm";
+import { SectionRenderer, HeroContent, AboutContent, ContactContent, ProjectsContent, ExperienceContent, TestimonialsContent, BlogTeaserContent } from "../portfolio/SectionRenderer";
 import {
   DndContext,
   closestCenter,
@@ -112,6 +113,7 @@ function SortableItem({ section, onToggleVisibility, onDeleteClick, onEditClick 
             {section.type === "Contact" && (section.content?.title || "Contact connections")}
             {section.type.toLowerCase() === "experience" && "Work experience timeline"}
             {section.type.toLowerCase() === "testimonials" && "Client testimonials and reviews"}
+            {(section.type.toLowerCase() === "blogteaser" || section.type.toLowerCase() === "blog_teaser") && "Latest blog posts teaser"}
           </p>
         </div>
       </div>
@@ -464,7 +466,7 @@ export function SectionList() {
                 }}
               />
               <div className="absolute right-0 mt-2 w-40 rounded-xl bg-zinc-900 border border-zinc-800 shadow-xl py-1.5 z-20 animate-[cardFadeIn_0.15s_cubic-bezier(0.16,1,0.3,1)]">
-                {["Hero", "About", "Projects", "Contact", "Experience", "Testimonials"].map((type) => (
+                {["Hero", "About", "Projects", "Contact", "Experience", "Testimonials", "BlogTeaser"].map((type) => (
                   <button
                     key={type}
                     disabled={creatingType !== null}
@@ -645,6 +647,13 @@ export function SectionList() {
                   ) : editingSection.type.toLowerCase() === "testimonials" ? (
                     <TestimonialsForm
                       value={draftContent as TestimonialsContent}
+                      onChange={setDraftContent}
+                      isSaving={isSavingSection}
+                      onSave={handleSaveSectionContent}
+                    />
+                  ) : (editingSection.type.toLowerCase() === "blogteaser" || editingSection.type.toLowerCase() === "blog_teaser") ? (
+                    <BlogTeaserForm
+                      value={draftContent as BlogTeaserContent}
                       onChange={setDraftContent}
                       isSaving={isSavingSection}
                       onSave={handleSaveSectionContent}

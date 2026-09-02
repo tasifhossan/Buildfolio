@@ -145,7 +145,12 @@ export default async function UsernamePage({ params }: PageProps) {
           </div>
         ) : (
           sanitizedSections.map((section) => (
-            <SectionRenderer key={section.type} section={section} />
+            <SectionRenderer
+              key={section.type}
+              section={section}
+              portfolioId={portfolio.id}
+              username={username}
+            />
           ))
         )}
       </main>

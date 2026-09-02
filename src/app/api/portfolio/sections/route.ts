@@ -6,9 +6,9 @@ import { revalidatePath } from "next/cache";
 
 const createSectionSchema = z.object({
   type: z.string().min(1, "Type is required").refine(
-    (val) => ["hero", "about", "projects", "contact", "experience", "testimonials"].includes(val.toLowerCase()),
+    (val) => ["hero", "about", "projects", "contact", "experience", "testimonials", "blogteaser", "blog_teaser"].includes(val.toLowerCase()),
     {
-      message: "Type must be one of: hero, about, projects, contact, experience, testimonials",
+      message: "Type must be one of: hero, about, projects, contact, experience, testimonials, blogteaser",
     }
   ),
 });
@@ -56,6 +56,14 @@ const DEFAULT_CONTENTS: Record<string, Record<string, JsonValue>> = {
         photoUrl: "",
       },
     ],
+  },
+  blogteaser: {
+    title: "From the Blog",
+    postCount: 3,
+  },
+  blog_teaser: {
+    title: "From the Blog",
+    postCount: 3,
   },
 };
 
