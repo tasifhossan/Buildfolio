@@ -95,15 +95,22 @@ export type BlogTeaserContent = z.infer<typeof BlogTeaserContentSchema>;
 export interface Section {
   type: string;
   content: unknown;
+  portfolioId?: string;
+  username?: string;
 }
 
 interface SectionRendererProps {
   section: Section;
+  portfolioId?: string;
+  username?: string;
 }
 
-export function SectionRenderer({ section }: SectionRendererProps) {
+export async function SectionRenderer({ section, portfolioId, username }: SectionRendererProps) {
   // Safe validation wrapper to catch malformed data and prevent layout crashes
   try {
+    const pId = section.portfolioId || portfolioId;
+    const uName = section.username || username;
+
     switch (section.type.toLowerCase()) {
       case "hero": {
         const validatedContent = HeroContentSchema.parse(section.content || {});
@@ -132,7 +139,7 @@ export function SectionRenderer({ section }: SectionRendererProps) {
       case "blogteaser":
       case "blog_teaser": {
         const validatedContent = BlogTeaserContentSchema.parse(section.content || {});
-        return <BlogTeaserSection content={validatedContent} />;
+        return <BlogTeaserSection content={validatedContent} portfolioId={pId} username={uName} />;
       }
       default:
         // If the type doesn't match any known component, render nothing and log a warning
