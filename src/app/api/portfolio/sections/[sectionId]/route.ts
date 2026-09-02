@@ -76,6 +76,11 @@ const TestimonialsContentSchema = z.object({
   items: z.array(TestimonialItemSchema).optional(),
 });
 
+const BlogTeaserContentSchema = z.object({
+  title: z.string().optional().default("From the Blog"),
+  postCount: z.number().int().min(1, "Post count must be at least 1").max(6, "Post count must be at most 6").optional().default(3),
+});
+
 interface RouteParams {
   params: Promise<{ sectionId: string }>;
 }
@@ -159,6 +164,8 @@ export async function PATCH(req: Request, { params }: RouteParams) {
       parseResult = ExperienceContentSchema.safeParse(content);
     } else if (type === "testimonials") {
       parseResult = TestimonialsContentSchema.safeParse(content);
+    } else if (type === "blogteaser" || type === "blog_teaser") {
+      parseResult = BlogTeaserContentSchema.safeParse(content);
     } else {
       return NextResponse.json({ error: "Unknown section type" }, { status: 400 });
     }
