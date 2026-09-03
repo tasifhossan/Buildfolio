@@ -466,7 +466,7 @@ export function SectionList() {
                 }}
               />
               <div className="absolute right-0 mt-2 w-40 rounded-xl bg-zinc-900 border border-zinc-800 shadow-xl py-1.5 z-20 animate-[cardFadeIn_0.15s_cubic-bezier(0.16,1,0.3,1)]">
-                {["Hero", "About", "Projects", "Contact", "Experience", "Testimonials", "BlogTeaser"].map((type) => (
+                {["Hero", "About", "Projects", "Contact", "Experience", "Testimonials", "BlogTeaser", "Blog"].map((type) => (
                   <button
                     key={type}
                     disabled={creatingType !== null}

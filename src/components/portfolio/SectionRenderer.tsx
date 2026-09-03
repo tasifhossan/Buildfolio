@@ -139,6 +139,7 @@ export function SectionRenderer({ section, portfolioId, username }: SectionRende
         const validatedContent = TestimonialsContentSchema.parse(section.content || {});
         return <TestimonialsSection content={validatedContent} />;
       }
+      case "blog":
       case "blogteaser":
       case "blog_teaser": {
         const validatedContent = BlogTeaserContentSchema.parse(section.content || {});
