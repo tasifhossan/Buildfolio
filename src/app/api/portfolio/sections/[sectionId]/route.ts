@@ -161,7 +161,7 @@ export async function PATCH(req: Request, { params }: RouteParams) {
       parseResult = ExperienceContentSchema.safeParse(content);
     } else if (type === "testimonials") {
       parseResult = TestimonialsContentSchema.safeParse(content);
-    } else if (type === "blogteaser" || type === "blog_teaser") {
+    } else if (type === "blogteaser" || type === "blog_teaser" || type === "blog") {
       parseResult = BlogTeaserContentSchema.safeParse(content);
     } else {
       return NextResponse.json({ error: "Unknown section type" }, { status: 400 });
